@@ -1,0 +1,1418 @@
+symptôme,nb_maladies,fréquence (%)
+fievre,37,8.6
+fatigue,31,7.2
+amaigrissement,28,6.5
+cephalees,18,4.2
+douleurs abdominales,17,3.9
+douleur thoracique,17,3.9
+adenopathies,13,3.0
+toux seche,13,3.0
+fievre moderee,13,3.0
+alteration de l'etat general,13,3.0
+fievre elevee,12,2.8
+douleurs musculaires,12,2.8
+nausees,12,2.8
+ictere,12,2.8
+vomissements,12,2.8
+palpitations,10,2.3
+tachycardie,9,2.1
+dyspnee,9,2.1
+souvent asymptomatique,8,1.9
+toux,8,1.9
+perte de poids,8,1.9
+prurit intense,8,1.9
+troubles de la conscience,7,1.6
+retard de croissance,7,1.6
+dyspnee d'effort progressive,7,1.6
+œdemes des membres inferieurs,7,1.6
+dysphagie,7,1.6
+hematurie,7,1.6
+fatigue intense,7,1.6
+hemoptysie,6,1.4
+vertiges,6,1.4
+prurit,6,1.4
+douleur epigastrique,6,1.4
+nausees et vomissements,6,1.4
+arthralgies,6,1.4
+adenopathies cervicales,6,1.4
+douleurs osseuses,6,1.4
+deshydratation,6,1.4
+douleurs articulaires,5,1.2
+raideur de la nuque,5,1.2
+cephalees intenses,5,1.2
+confusion,5,1.2
+eruption cutanee,5,1.2
+lesions cutanees,5,1.2
+faiblesse musculaire,5,1.2
+insuffisance renale,5,1.2
+essoufflement,5,1.2
+ascite,5,1.2
+rougeur,5,1.2
+dyspnee progressive,5,1.2
+toux productive,5,1.2
+sensation de pesanteur,5,1.2
+asthenie,5,1.2
+troubles de la deglutition,5,1.2
+splenomegalie,5,1.2
+toux persistante,4,0.9
+troubles neurologiques,4,0.9
+crampes musculaires,4,0.9
+oligurie,4,0.9
+absence de pouls,4,0.9
+cyanose,4,0.9
+parfois asymptomatique,4,0.9
+hypotension arterielle,4,0.9
+œdeme,4,0.9
+etat de choc,4,0.9
+dyspnee d'effort,4,0.9
+dysphonie,4,0.9
+anorexie,4,0.9
+hypertension arterielle,4,0.9
+pollakiurie,4,0.9
+douleur lombaire,4,0.9
+masse abdominale palpable,4,0.9
+infections recidivantes,4,0.9
+troubles digestifs,4,0.9
+deformations osseuses,4,0.9
+troubles du sommeil,4,0.9
+troubles de la marche,4,0.9
+douleurs pelviennes,4,0.9
+lesions de grattage,4,0.9
+saignements,4,0.9
+variable selon la localisation,4,0.9
+photophobie,3,0.7
+chaleur locale,3,0.7
+syncope,3,0.7
+troubles visuels,3,0.7
+syncopes,3,0.7
+mort subite,3,0.7
+diarrhee,3,0.7
+œdeme local,3,0.7
+toux chronique productive,3,0.7
+syndrome pseudo-grippal,3,0.7
+sueurs profuses,3,0.7
+sibilants,3,0.7
+myalgies,3,0.7
+tachypnee,3,0.7
+hepatomegalie,3,0.7
+amaigrissement rapide,3,0.7
+asymptomatique dans la majorite des cas,3,0.7
+diarrhee chronique,3,0.7
+toux nocturne,3,0.7
+œdemes,3,0.7
+petite taille,3,0.7
+faiblesse musculaire proximale,3,0.7
+troubles du comportement,3,0.7
+troubles de la sensibilite,3,0.7
+troubles sensitifs,3,0.7
+ballonnements,3,0.7
+douleurs a la miction,3,0.7
+odeur desagreable,3,0.7
+douleur locale,3,0.7
+demangeaisons,3,0.7
+adenopathies inguinales,3,0.7
+masse tumorale,3,0.7
+fievre prolongee,3,0.7
+frissons,2,0.5
+convulsions,2,0.5
+detresse respiratoire,2,0.5
+sueurs nocturnes,2,0.5
+urines foncees,2,0.5
+selles decolorees,2,0.5
+hemorragies,2,0.5
+souffle cardiaque,2,0.5
+difficultes alimentaires,2,0.5
+lourdeurs des jambes,2,0.5
+œdemes vesperaux,2,0.5
+rougeur locale,2,0.5
+limitation fonctionnelle,2,0.5
+difficulte a avaler,2,0.5
+diarrhee sanglante,2,0.5
+perte de conscience brutale,2,0.5
+arret respiratoire,2,0.5
+crises convulsives,2,0.5
+essoufflement a l'effort,2,0.5
+turgescence jugulaire,2,0.5
+paleur,2,0.5
+contracture abdominale,2,0.5
+chaleur cutanee,2,0.5
+douleur moderee,2,0.5
+sifflements respiratoires,2,0.5
+infections bronchiques recurrentes,2,0.5
+uveite,2,0.5
+dyspnee d'intensite variable,2,0.5
+sensation d'oppression,2,0.5
+expectorations purulentes,2,0.5
+infections respiratoires recurrentes,2,0.5
+cephalees matinales,2,0.5
+sensation d'etouffement,2,0.5
+tetanie,2,0.5
+agitation,2,0.5
+pneumothorax recidivant,2,0.5
+douleur retrosternale,2,0.5
+douleur thoracique retrosternale,2,0.5
+perte d'appetit,2,0.5
+troubles du transit,2,0.5
+douleur de l'hypochondre droit,2,0.5
+encephalopathie hepatique,2,0.5
+xanthelasmas,2,0.5
+defense abdominale,2,0.5
+diabete,2,0.5
+retard d'emission du meconium (>48h),2,0.5
+constipation severe des la naissance,2,0.5
+vomissements bilieux,2,0.5
+ballonnement abdominal,2,0.5
+regurgitations acides,2,0.5
+prurit anal,2,0.5
+douleur a la pression,2,0.5
+regurgitations,2,0.5
+melena,2,0.5
+diarrhee aqueuse profuse,2,0.5
+douleurs abdominales crampoides,2,0.5
+douleurs lombaires,2,0.5
+brulures mictionnelles,2,0.5
+difficultes respiratoires,2,0.5
+conjonctivite,2,0.5
+angine severe,2,0.5
+infection urinaire recidivante,2,0.5
+polyurie,2,0.5
+polydipsie,2,0.5
+tremblements,2,0.5
+troubles de la concentration,2,0.5
+douleur cervicale,2,0.5
+goitre,2,0.5
+masse cervicale,2,0.5
+hyperhidrose,2,0.5
+fractures pathologiques,2,0.5
+atrophie musculaire,2,0.5
+hyperactivite,2,0.5
+nausees vomissements,2,0.5
+acanthosis nigricans,2,0.5
+douleurs articulaires chroniques,2,0.5
+colique nephretique,2,0.5
+amenorrhee,2,0.5
+deviation de la bouche,2,0.5
+troubles de conscience,2,0.5
+apathie,2,0.5
+faiblesse musculaire distale,2,0.5
+incontinence urinaire,2,0.5
+faiblesse de la prehension,2,0.5
+troubles cognitifs frontaux,2,0.5
+irritabilite,2,0.5
+sentiment de perte de controle,2,0.5
+difficultes d'interaction sociale,2,0.5
+flatulences,2,0.5
+malabsorption,2,0.5
+hepatite,2,0.5
+signes neurologiques focaux,2,0.5
+raideur matinale prolongee,2,0.5
+enthesites,2,0.5
+enthesite,2,0.5
+surdite de transmission,2,0.5
+limitation articulaire,2,0.5
+arthrite,2,0.5
+erytheme,2,0.5
+squames,2,0.5
+prurit variable,2,0.5
+sensation de brulure,2,0.5
+lichenification,2,0.5
+vesicules,2,0.5
+peau seche et squameuse,2,0.5
+prurit modere,2,0.5
+atteinte muqueuse severe,2,0.5
+ulceration persistante,2,0.5
+odynophagie,2,0.5
+limites imprecises,2,0.5
+troubles urinaires,2,0.5
+urgence mictionnelle,2,0.5
+ulceration,2,0.5
+douleur thoracique laterale,2,0.5
+epanchement pleural recidivant,2,0.5
+masse abdominale,2,0.5
+infections respiratoires recidivantes,2,0.5
+brulures,2,0.5
+dysurie,2,0.5
+syndromes paraneoplasiques,2,0.5
+peu d'atteinte de l'etat general,2,0.5
+perte de connaissance,2,0.5
+vomissements projectile post-prandiaux,2,0.5
+faim vorace apres vomissements,2,0.5
+ondulations peristaltiques visibles,2,0.5
+anemie severe,2,0.5
+alteration de la conscience,2,0.5
+marbrures cutanees,2,0.5
+souffle cardiaque nouveau ou modifie,2,0.5
+"lesions cutanees (petechies, nodules d'osler)",2,0.5
+pneumonie,2,0.5
+signes d'insuffisance cardiaque,2,0.5
+fievre tres elevee,1,0.2
+vomissements incoercibles,1,0.2
+expectorations parfois sanglantes,1,0.2
+fievre vesperale,1,0.2
+dependent de l'organe atteint,1,0.2
+souvent asymptomatique longtemps,1,0.2
+ictere tardif,1,0.2
+similaires a hepatite a,1,0.2
+vomissements noirs,1,0.2
+cyanose (bebe bleu),1,0.2
+respiration rapide,1,0.2
+asymptomatique jusqu'a la rupture,1,0.2
+douleur thoracique ou abdominale intense,1,0.2
+douleur dorsale,1,0.2
+pulsations abdominales,1,0.2
+signes de choc en cas de rupture,1,0.2
+claudication intermittente,1,0.2
+douleurs de repos,1,0.2
+froids des pieds,1,0.2
+ulceres arteriels,1,0.2
+douleurs ischemiques des extremites,1,0.2
+ulceres digitaux,1,0.2
+phlebites superficielles migratrices,1,0.2
+gangrene digitale,1,0.2
+sensibilite au froid,1,0.2
+veines visibles et tortueuses,1,0.2
+douleurs,1,0.2
+crampes nocturnes,1,0.2
+cordon veineux douloureux,1,0.2
+œdeme modere,1,0.2
+induration,1,0.2
+œdeme ferme ne prenant pas le godet,1,0.2
+lourdeur du membre,1,0.2
+peau epaissie,1,0.2
+sensation de tension,1,0.2
+douleurs thoraciques,1,0.2
+syncopes d'effort,1,0.2
+dyspnee brutale,1,0.2
+douleur thoracique pleurale,1,0.2
+pression arterielle basse,1,0.2
+extremites froides et moites,1,0.2
+douleurs articulaires intenses,1,0.2
+douleurs retro-orbitaires,1,0.2
+douleurs articulaires invalidantes,1,0.2
+anxiete,1,0.2
+hydrophobie,1,0.2
+aerophobie,1,0.2
+salivation excessive,1,0.2
+spasmes musculaires,1,0.2
+raideur musculaire,1,0.2
+spasmes douloureux,1,0.2
+trismus (machoire bloquee),1,0.2
+spasmes generalises,1,0.2
+taches cutanees depigmentees,1,0.2
+perte de sensibilite,1,0.2
+epaississement des nerfs,1,0.2
+dermatite au point de penetration,1,0.2
+lymphœdeme,1,0.2
+douleurs genitales,1,0.2
+elephantiasis,1,0.2
+demangeaisons intenses,1,0.2
+nodules sous-cutanes,1,0.2
+cecite,1,0.2
+escarre d'inoculation,1,0.2
+mydriase,1,0.2
+antecedents familiaux de mort subite,1,0.2
+palpitations rapides et brutales,1,0.2
+palpitations rapides,1,0.2
+arret cardiaque,1,0.2
+mort imminente sans traitement,1,0.2
+bradycardie,1,0.2
+syncopes (bloc complet),1,0.2
+syncopes a l'effort ou aux emotions,1,0.2
+antecedents familiaux,1,0.2
+insuffisance cardiaque droite,1,0.2
+embolies systemiques,1,0.2
+obstruction mitrale intermittente,1,0.2
+souffle cardiaque variable,1,0.2
+bruits pericardiques (bruit de rappel),1,0.2
+dyspnee severe,1,0.2
+bruits cardiaques assourdis,1,0.2
+pouls paradoxal,1,0.2
+claudication des membres superieurs,1,0.2
+cephalees temporales,1,0.2
+claudication de la machoire,1,0.2
+troubles visuels (amblyopie),1,0.2
+douleurs du cuir chevelu,1,0.2
+cordons veineux douloureux migrateurs,1,0.2
+douleur brutale,1,0.2
+froid du membre,1,0.2
+paralysie,1,0.2
+douleur abdominale disproportionnee,1,0.2
+saignement digestif,1,0.2
+coloration bleutee des mains et pieds,1,0.2
+sensation de froid,1,0.2
+transpiration des paumes et plantes,1,0.2
+aggravation par le froid,1,0.2
+amelioration par la chaleur,1,0.2
+douleur brulante intense,1,0.2
+aggravation par la chaleur,1,0.2
+soulagement par le froid,1,0.2
+varices,1,0.2
+dermite ocre,1,0.2
+douleur localisee le long d'une veine,1,0.2
+induration en cordon,1,0.2
+plaie superficielle a bords irreguliers,1,0.2
+localisation peri-malleolaire interne,1,0.2
+dermite ocre peri-lesionnelle,1,0.2
+plaie profonde a bords nets,1,0.2
+"douleur intense, surtout nocturne",1,0.2
+"localisation distale (orteils, talon)",1,0.2
+peau atrophique et froide,1,0.2
+pouls absents,1,0.2
+sensation d'oppression thoracique,1,0.2
+aggravation nocturne,1,0.2
+expectorations matinales,1,0.2
+sifflements,1,0.2
+infections bronchiques frequentes,1,0.2
+dyspnee d'effort majeure,1,0.2
+thorax en tonneau,1,0.2
+respiration a levres pincees,1,0.2
+toux peu productive,1,0.2
+expectorations purulentes abondantes,1,0.2
+hemoptysies,1,0.2
+asymptomatique dans 50% des cas,1,0.2
+toux seche irritante,1,0.2
+crepitants inspiratoires,1,0.2
+acropachie (hippocratisme digital),1,0.2
+douleur thoracique laterale brutale,1,0.2
+syndrome pleural,1,0.2
+douleur thoracique laterale a type de point de cote,1,0.2
+douleur augmentee a l'inspiration,1,0.2
+dyspnee si epanchement important,1,0.2
+fievre si infectieuse,1,0.2
+expectorations brunatres,1,0.2
+adenopathies mediastinales,1,0.2
+toux productive chronique,1,0.2
+troubles digestifs (steatorrhee),1,0.2
+ronflements importants,1,0.2
+sensation d'etouffement nocturne,1,0.2
+somnolence diurne excessive,1,0.2
+fatigue matinale,1,0.2
+respiration rapide et superficielle,1,0.2
+paresthesies peri-orales et des extremites,1,0.2
+dyspnee severe d'apparition brutale,1,0.2
+expectoration mousseuse rosee,1,0.2
+chylothorax,1,0.2
+angiomyolipomes renaux,1,0.2
+expectorations opaques,1,0.2
+dyspnee expiratoire,1,0.2
+toux aboyante,1,0.2
+stridor,1,0.2
+expectorations difficiles,1,0.2
+toux chronique,1,0.2
+expectorations,1,0.2
+dyspnee severe d'apparition rapide,1,0.2
+signes de lutte respiratoire,1,0.2
+hypoxemie refractaire,1,0.2
+diminution du murmure vesiculaire,1,0.2
+fievre si surinfection,1,0.2
+epanchement pleural,1,0.2
+toux productive avec expectorations abondantes,1,0.2
+hypoxemie,1,0.2
+sibilants localises,1,0.2
+syndrome carcinoide si metastases hepatiques,1,0.2
+toux seche et quinteuse,1,0.2
+sensation d'irritation,1,0.2
+dyspnee si œdeme important,1,0.2
+enrouement,1,0.2
+aphonie,1,0.2
+gene pharyngee,1,0.2
+expectorations mucopurulentes,1,0.2
+brulures gastriques,1,0.2
+sensation de faim douloureuse,1,0.2
+hematemese ou melena,1,0.2
+sensation de plenitude,1,0.2
+hematemese,1,0.2
+rectorragies,1,0.2
+anemie ferriprive,1,0.2
+douleur epigastrique irradiant dans le dos,1,0.2
+ictere indolore,1,0.2
+diabete d'apparition recente,1,0.2
+hepatomegalie douloureuse,1,0.2
+gene de l'hypochondre droit,1,0.2
+douleur abdominale intense irradiant dans le dos,1,0.2
+etat de choc dans les formes severes,1,0.2
+ileus reflexe,1,0.2
+douleur abdominale chronique,1,0.2
+steatorrhee,1,0.2
+ictere obstructif,1,0.2
+douleur de la fosse iliaque gauche,1,0.2
+defense localisee,1,0.2
+leucocytose,1,0.2
+distension abdominale,1,0.2
+arret des matieres et des gaz,1,0.2
+vomissements alimentaires puis bilieux,1,0.2
+douleur abdominale intense et generalisee,1,0.2
+douleur de la fosse iliaque droite,1,0.2
+signe de blumberg positif,1,0.2
+pyrosis,1,0.2
+tumefaction inguinale,1,0.2
+douleur a l'effort,1,0.2
+augmentation de volume a la toux,1,0.2
+tumefaction ombilicale,1,0.2
+augmentation a l'effort,1,0.2
+reductibilite,1,0.2
+douleur anales intenses a la defecation,1,0.2
+saignements rouge vif sur le papier,1,0.2
+spasme du sphincter anal,1,0.2
+ecoulement purulent chronique,1,0.2
+irritation cutanee,1,0.2
+orifice cutane visible,1,0.2
+saignements rouge vif indolores,1,0.2
+prolapsus hemorroidaire,1,0.2
+douleur en cas de thrombose,1,0.2
+dysphagie aux solides et aux liquides,1,0.2
+regurgitations alimentaires,1,0.2
+dysphagie intermittente,1,0.2
+sensation de blocage alimentaire,1,0.2
+douleur pouvant simuler un angor,1,0.2
+pyrosis chronique,1,0.2
+asymptomatique dans certains cas,1,0.2
+dysphagie haute,1,0.2
+regurgitations d'aliments non digeres,1,0.2
+haleine fetide,1,0.2
+hematemese apres vomissements,1,0.2
+signes d'anemie aigue,1,0.2
+hematemese brutale et abondante,1,0.2
+signes d'hypertension portale,1,0.2
+satiete precoce,1,0.2
+douleurs epigastriques rebelles,1,0.2
+reflux severe,1,0.2
+ulceres peptiques recidivants,1,0.2
+dilatation abdominale aigue,1,0.2
+douleur abdominale,1,0.2
+sang dans les selles (parfois),1,0.2
+signes de deshydratation,1,0.2
+douleur abdominale brutale,1,0.2
+saignement rectal,1,0.2
+oligurie ou anurie,1,0.2
+rash cutane,1,0.2
+infections urinaires recurrentes,1,0.2
+douleur lombaire aigue irradiante,1,0.2
+douleur lombaire unilaterale intense,1,0.2
+irradiation a la fosse iliaque et aux organes genitaux,1,0.2
+proteinurie,1,0.2
+surdite de perception,1,0.2
+troubles visuels (lenticone anterieur),1,0.2
+insuffisance renale progressive,1,0.2
+asymptomatique,1,0.2
+decouverte fortuite,1,0.2
+parfois douleur lombaire si hypertrophie,1,0.2
+masse lombaire,1,0.2
+infection urinaire,1,0.2
+anurie si obstruction complete bilaterale,1,0.2
+hematurie macroscopique,1,0.2
+insuffisance renale aigue,1,0.2
+courbatures,1,0.2
+maux de gorge,1,0.2
+perte du gout/odorat,1,0.2
+eruption cutanee (visage puis corps),1,0.2
+coryza,1,0.2
+taches de koplik,1,0.2
+gonflement des glandes parotides,1,0.2
+douleurs a la mastication,1,0.2
+maux de tete,1,0.2
+eruption cutanee discrete,1,0.2
+eruption vesiculeuse prurigineuse,1,0.2
+quintes de toux paroxystiques,1,0.2
+inspiration bruyante (chant du coq),1,0.2
+vomissements post-tussifs,1,0.2
+apnees chez le nourrisson,1,0.2
+fausses membranes grisatres,1,0.2
+œdeme du cou,1,0.2
+paralysies flasques,1,0.2
+fievre elevee progressive,1,0.2
+diarrhee ou constipation,1,0.2
+etat confusionnel,1,0.2
+troubles mictionnels,1,0.2
+troubles de la vision,1,0.2
+cicatrisation lente,1,0.2
+polyurie moderee,1,0.2
+sueurs,1,0.2
+polydipsie moderee,1,0.2
+infections urinaires,1,0.2
+nervosite,1,0.2
+thermophobie,1,0.2
+prise de poids,1,0.2
+frilosite,1,0.2
+ralentissement psychomoteur,1,0.2
+constipation,1,0.2
+symptomes d'hyper ou hypothyroidie,1,0.2
+compression tracheale,1,0.2
+nodule thyroidien dur,1,0.2
+adenopathie cervicale,1,0.2
+masse cervicale fixe,1,0.2
+asthenie majeure,1,0.2
+hyperpigmentation cutanee,1,0.2
+obesite facio-tronculaire,1,0.2
+vergetures pourpres,1,0.2
+fragilite capillaire,1,0.2
+crampes,1,0.2
+poussees hypertensives,1,0.2
+cephalees pulsatiles,1,0.2
+elargissement des extremites,1,0.2
+modifications faciales,1,0.2
+syndrome du canal carpien,1,0.2
+retard de croissance staturale,1,0.2
+dysmorphies associees selon la cause,1,0.2
+retard pubertaire,1,0.2
+developpement mammaire precoce,1,0.2
+poussee de croissance acceleree,1,0.2
+apparition de la pilosite pubienne,1,0.2
+regles chez la fille,1,0.2
+mue de la voix chez le garcon,1,0.2
+absence de developpement mammaire,1,0.2
+amenorrhee primaire,1,0.2
+absence de pilosite pubienne,1,0.2
+immaturite morphologique,1,0.2
+cycle menstruels irreguliers,1,0.2
+hirsutisme,1,0.2
+acne,1,0.2
+surpoids,1,0.2
+difficultes de procreation,1,0.2
+douleurs osseuses diffuses,1,0.2
+deformation osseuse,1,0.2
+difficulte a la marche,1,0.2
+hypotonie musculaire,1,0.2
+craniotabes,1,0.2
+retard d'eruption dentaire,1,0.2
+augmentation du poids,1,0.2
+transpiration excessive,1,0.2
+troubles cutanes,1,0.2
+masse cervicale anterieure,1,0.2
+sensation de gene cervicale,1,0.2
+dysphagie moderee,1,0.2
+toux irritative,1,0.2
+douleur cervicale anterieure,1,0.2
+symptomes d'hyperthyroidie transitoire,1,0.2
+masse cervicale a croissance rapide,1,0.2
+lithiase renale,1,0.2
+troubles psychiques,1,0.2
+paresthesies,1,0.2
+cataracte,1,0.2
+hypocalcemie,1,0.2
+brachymetacarpie,1,0.2
+osteodystrophie,1,0.2
+retard mental,1,0.2
+calcifications sous-cutanees,1,0.2
+troubles de l'attention,1,0.2
+polyurie massive (3-20 l/jour),1,0.2
+polydipsie intense,1,0.2
+nycturie,1,0.2
+soif inextinguible,1,0.2
+coma dans les formes severes,1,0.2
+croissance staturale excessive,1,0.2
+macrocranie,1,0.2
+prognathisme,1,0.2
+retard statural severe,1,0.2
+retard de maturation osseuse,1,0.2
+visage poupin,1,0.2
+voix aigue,1,0.2
+hypoglycemies neonatales,1,0.2
+surpoids abdominal,1,0.2
+atrophie du tissu adipeux,1,0.2
+insulinoresistance severe,1,0.2
+hypertriglyceridemie,1,0.2
+steatose hepatique,1,0.2
+xanthomes tendineux,1,0.2
+arc corneen avant 45 ans,1,0.2
+atherosclerose precoce,1,0.2
+arthrite aigue douloureuse,1,0.2
+tophus,1,0.2
+"polyurie, polydipsie",1,0.2
+ecoulement mamelonnaire laiteux,1,0.2
+infertilite,1,0.2
+baisse de la libido,1,0.2
+hemiplegie ou hemiparesie,1,0.2
+troubles de la parole (aphasie),1,0.2
+cephalee brutale et intense,1,0.2
+vomissements en jet,1,0.2
+rigidite meningee,1,0.2
+deficit neurologique focal,1,0.2
+crises convulsives tonico-cloniques,1,0.2
+absences,1,0.2
+crises partielles complexes,1,0.2
+myoclonies,1,0.2
+auras sensorielles,1,0.2
+troubles de la memoire recente,1,0.2
+desorientation temporo-spatiale,1,0.2
+difficultes de langage,1,0.2
+tremblement de repos,1,0.2
+rigidite musculaire,1,0.2
+akinesie,1,0.2
+troubles autonomiques,1,0.2
+troubles visuels (nevrite optique),1,0.2
+troubles de l'equilibre,1,0.2
+troubles vesicosphincteriens,1,0.2
+faiblesse musculaire progressive,1,0.2
+fasciculations,1,0.2
+troubles de la parole,1,0.2
+ptosis,1,0.2
+diplopie,1,0.2
+faiblesse faciale,1,0.2
+faiblesse des membres,1,0.2
+contractions musculaires soutenues,1,0.2
+postures anormales,1,0.2
+tremblement dystonique,1,0.2
+amelioration par le geste antagoniste,1,0.2
+mouvements choreiques,1,0.2
+troubles cognitifs,1,0.2
+troubles psychiatriques,1,0.2
+cephalee unilaterale pulsative,1,0.2
+photophobie et phonophobie,1,0.2
+aura visuelle ou sensitive,1,0.2
+aggravation par l'effort,1,0.2
+sensation d'etau bilateral,1,0.2
+douleur non pulsative,1,0.2
+intensite legere a moderee,1,0.2
+pas de nausees vomissements,1,0.2
+duree variable (30 min a 7 jours),1,0.2
+douleur orbitaire atroce,1,0.2
+larmoiement homolateral,1,0.2
+rhinorrhee homolaterale,1,0.2
+ptosis ou myosis,1,0.2
+agitation pendant la crise,1,0.2
+decharges electriques faciales,1,0.2
+douleur unilaterale,1,0.2
+territoire du trijumeau,1,0.2
+zones gachettes,1,0.2
+pas de deficit sensitif,1,0.2
+asymetrie faciale,1,0.2
+impossibilite de fermer l'œil,1,0.2
+diminution du gout,1,0.2
+hyperacousie,1,0.2
+faiblesse musculaire ascendante,1,0.2
+areflexie osteotendineuse,1,0.2
+paresthesies des extremites,1,0.2
+atteinte des nerfs craniens,1,0.2
+fourmillements des extremites,1,0.2
+brulures des pieds et mains,1,0.2
+diminution des reflexes,1,0.2
+brulures plantaires,1,0.2
+fourmillements nocturnes,1,0.2
+douleurs en chaussette,1,0.2
+cephalee intense,1,0.2
+purpura fulminans (meningocoque),1,0.2
+demence sous-corticale,1,0.2
+masse dorsale/lombaire a la naissance,1,0.2
+paralysie des membres inferieurs,1,0.2
+incontinence urinaire et fecale,1,0.2
+hydrocephalie associee,1,0.2
+fourmillements nocturnes main,1,0.2
+douleurs main et poignet,1,0.2
+engourdissements pouce-index-majeur,1,0.2
+atrophie de l'eminence thenar,1,0.2
+douleur lombaire irradiant a la fesse,1,0.2
+douleur posterieure de cuisse et jambe,1,0.2
+fourmillements pied et orteils,1,0.2
+aggravation a la touse et aux efforts,1,0.2
+douleur lombaire irradiant face anterieure de cuisse,1,0.2
+douleur inguinale,1,0.2
+fourmillements face interne de genou,1,0.2
+faiblesse quadriceps,1,0.2
+abolition reflexe rotulien,1,0.2
+lombalgie aigue,1,0.2
+douleur radiculaire,1,0.2
+troubles reflexes,1,0.2
+fluctuations cognitives,1,0.2
+hallucinations visuelles,1,0.2
+syndrome parkinsonien,1,0.2
+troubles du sommeil paradoxal,1,0.2
+hypersensibilite aux neuroleptiques,1,0.2
+desinhibition sociale,1,0.2
+troubles du langage,1,0.2
+comportements stereotypes,1,0.2
+troubles severes du comportement,1,0.2
+aphasie progressive,1,0.2
+atrophie frontotemporale marquee,1,0.2
+desinhibition,1,0.2
+troubles executifs,1,0.2
+paralysie verticale du regard,1,0.2
+instabilite posturale et chutes,1,0.2
+syndrome parkinsonien axial,1,0.2
+dysarthrie et dysphagie,1,0.2
+syndrome parkinsonien peu dopasensible,1,0.2
+ataxie cerebelleuse,1,0.2
+dysautonomie severe,1,0.2
+troubles pyramidaux,1,0.2
+stridor larynge,1,0.2
+syndrome parkinsonien asymetrique,1,0.2
+apraxie ideomotrice,1,0.2
+phenomene de membre etranger,1,0.2
+dystonie,1,0.2
+tics moteurs multiples,1,0.2
+tics vocaux,1,0.2
+coprolalie (rare),1,0.2
+echolalie,1,0.2
+"troubles comorbides (toc, tdah)",1,0.2
+secousses musculaires breves,1,0.2
+mouvements involontaires soudains,1,0.2
+aggravation par la fatigue ou le stress,1,0.2
+preservation de la conscience,1,0.2
+tremblement des mains,1,0.2
+tremblement de la tete,1,0.2
+tremblement vocal,1,0.2
+aggravation par le stress,1,0.2
+amelioration par l'alcool,1,0.2
+tristesse persistante,1,0.2
+anhedonie,1,0.2
+idees noires,1,0.2
+episodes depressifs,1,0.2
+episodes maniaques,1,0.2
+idees de grandeur,1,0.2
+acceleration de la pensee,1,0.2
+troubles du jugement,1,0.2
+inquietude excessive,1,0.2
+tension musculaire,1,0.2
+crises de panique aigues,1,0.2
+peur de mourir ou de devenir fou,1,0.2
+"sueurs, tremblements",1,0.2
+peur des situations sociales,1,0.2
+"rougeurs, tremblements",1,0.2
+evitement des interactions,1,0.2
+peur d'etre observe,1,0.2
+anxiete d'anticipation,1,0.2
+pensees obsedantes,1,0.2
+comportements compulsifs,1,0.2
+rituels mentaux,1,0.2
+anxiete si non execution,1,0.2
+perte de temps importante,1,0.2
+"reviviscences (flashbacks, cauchemars)",1,0.2
+evitement des stimuli associes,1,0.2
+alterations cognitives et mood,1,0.2
+hypervigilance,1,0.2
+reactivite physiologique,1,0.2
+patterns relationnels dysfonctionnels,1,0.2
+rigidite cognitive et comportementale,1,0.2
+difficultes d'adaptation,1,0.2
+souffrance subjective,1,0.2
+alteration du fonctionnement social,1,0.2
+restriction alimentaire severe,1,0.2
+peur intense de grossir,1,0.2
+alteration de l'image corporelle,1,0.2
+denutrition severe,1,0.2
+crises de hyperphagie,1,0.2
+"comportements compensatoires (vomissements, laxatifs)",1,0.2
+preoccupation excessive pour le poids,1,0.2
+honete apres les crises,1,0.2
+crises de hyperphagie recurrentes,1,0.2
+consommation rapide de grandes quantites,1,0.2
+detresse importante,1,0.2
+absence de comportements compensatoires,1,0.2
+inattention,1,0.2
+impulsivite,1,0.2
+difficultes d'organisation,1,0.2
+oublis frequents,1,0.2
+troubles de la communication,1,0.2
+comportements repetitifs,1,0.2
+interets restreints,1,0.2
+hypo ou hyper sensorialite,1,0.2
+interets restreints et intenses,1,0.2
+routines rigides,1,0.2
+langage formel et litteral,1,0.2
+difficultes de communication non verbale,1,0.2
+agression envers personnes ou animaux,1,0.2
+destruction de biens,1,0.2
+tricherie ou vol,1,0.2
+violation grave de regles,1,0.2
+absence de remords,1,0.2
+coleres frequentes,1,0.2
+argumentation avec adultes,1,0.2
+refus actif des consignes,1,0.2
+agacement delibere d'autrui,1,0.2
+mise en cause de sa responsabilite,1,0.2
+diarrhee aqueuse profuse (eau de riz),1,0.2
+deshydratation severe,1,0.2
+collapsus cardiovasculaire,1,0.2
+diarrhee glairo-sanglante,1,0.2
+tenesme,1,0.2
+purpura fulminans,1,0.2
+syndrome grippal,1,0.2
+fatigue prolongee,1,0.2
+chancre indolore (stade 1),1,0.2
+eruption cutanee (stade 2),1,0.2
+lesions neurologiques (stade 3),1,0.2
+atteinte cardiovasculaire,1,0.2
+ecoulement uretral purulent,1,0.2
+douleurs pelviennes (femme),1,0.2
+ecoulement vaginal,1,0.2
+pharyngite,1,0.2
+ecoulement genital,1,0.2
+saignements intermenstruels,1,0.2
+troubles cognitifs en marche d'escalier,1,0.2
+troubles executifs predominants,1,0.2
+conviction d'etre empoisonne,1,0.2
+refus de nourriture ou medicaments,1,0.2
+mefiance extreme,1,0.2
+isolement social,1,0.2
+comportements de verification,1,0.2
+conviction d'etre mort,1,0.2
+delire de negation d'organes,1,0.2
+delire d'immortalite,1,0.2
+anesthesie morale,1,0.2
+refus de s'alimenter,1,0.2
+idees delirantes non bizarres,1,0.2
+"persecution, jalousie, erotomanie",1,0.2
+fonctionnement preserve hors du delire,1,0.2
+absence d'hallucinations marquees,1,0.2
+mefiance et isolation,1,0.2
+apparition brutale de symptomes psychotiques,1,0.2
+delire et/ou hallucinations,1,0.2
+desorganisation,1,0.2
+emotions inappropriees,1,0.2
+resolution complete en < 1 mois,1,0.2
+idees de reference,1,0.2
+croyances bizarres,1,0.2
+perceptions inhabituelles,1,0.2
+pensee et langage bizarres,1,0.2
+comportement excentrique,1,0.2
+instabilite affective,1,0.2
+relations interpersonnelles chaotiques,1,0.2
+peur de l'abandon,1,0.2
+comportements impulsifs,1,0.2
+comportements auto-agressifs,1,0.2
+simulation consciente de symptomes,1,0.2
+comportement de recherche de soins,1,0.2
+antecedents medicaux complexes,1,0.2
+echec des traitements,1,0.2
+absence de benefice externe evident,1,0.2
+symptomes physiques spectaculaires,1,0.2
+peregrinations medicales,1,0.2
+antecedents medicaux riches et incoherents,1,0.2
+demandes d'interventions invasives,1,0.2
+absence de benefice externe,1,0.2
+arthrite symetrique des mains,1,0.2
+gonflements articulaires,1,0.2
+fatigue et alteration de l'etat general,1,0.2
+douleurs mecaniques articulaires,1,0.2
+raideur articulaire breve,1,0.2
+limitation des amplitudes articulaires,1,0.2
+deformations articulaires,1,0.2
+craquements articulaires,1,0.2
+douleurs inflammatoires rachidiennes,1,0.2
+sacro-ileite,1,0.2
+uveite anterieure aigue,1,0.2
+rash malaire,1,0.2
+arthrites,1,0.2
+atteinte renale,1,0.2
+photosensibilite,1,0.2
+manifestations neurologiques,1,0.2
+douleurs musculo-squelettiques diffuses,1,0.2
+fatigue chronique,1,0.2
+points douloureux a la pression,1,0.2
+troubles cognitifs (fibro-fog),1,0.2
+arthrite aigue tres douloureuse,1,0.2
+predilection pour le premier orteil,1,0.2
+rougeur et chaleur articulaire,1,0.2
+douleur maximum en 24h,1,0.2
+tophus dans les formes chroniques,1,0.2
+asymptomatique jusqu'a la fracture,1,0.2
+tassements vertebraux,1,0.2
+douleurs rachidiennes,1,0.2
+diminution de taille,1,0.2
+cygose,1,0.2
+sclerose cutanee,1,0.2
+phenomene de raynaud,1,0.2
+ulcerations digitales,1,0.2
+atteinte œsophagienne,1,0.2
+hypertension arterielle pulmonaire,1,0.2
+secheresse buccale et oculaire,1,0.2
+parotidite,1,0.2
+manifestations extraglandulaires,1,0.2
+"eruption cutanee (heliotrope, papules de gottron)",1,0.2
+atteinte pulmonaire,1,0.2
+eruption heliotrope des paupieres,1,0.2
+papules de gottron,1,0.2
+signe du chale,1,0.2
+mecanique des mains,1,0.2
+arthrite asymetrique,1,0.2
+dactylite (doigt en saucisse),1,0.2
+psoriasis cutane ou ungueal,1,0.2
+rachialgies inflammatoires,1,0.2
+arthrite aigue pseudo-goutte,1,0.2
+arthrose acceleree,1,0.2
+"atteinte du genou, poignet, hanche",1,0.2
+calcifications cartilagineuses a la radio,1,0.2
+augmentation de volume du crane,1,0.2
+douleur lombaire basse,1,0.2
+raideur lombaire,1,0.2
+irradiation possible aux fesses/cuisses,1,0.2
+aggravation a la mobilisation,1,0.2
+limitation des activites,1,0.2
+irradiation aux epaules ou bras,1,0.2
+limitation de la rotation cervicale,1,0.2
+douleur dorsale mediane ou paravertebrale,1,0.2
+raideur dorsale,1,0.2
+douleurs intercostales,1,0.2
+aggravation a la respiration profonde,1,0.2
+points douloureux a la palpation,1,0.2
+douleur a la mobilisation active,1,0.2
+douleur a la palpation du tendon,1,0.2
+craquements parfois,1,0.2
+gonflement localise,1,0.2
+fluctuation a la palpation,1,0.2
+douleur face externe du coude,1,0.2
+douleur a la palpation de l'epicondyle,1,0.2
+douleur a l'extension contrariee du poignet,1,0.2
+douleur irradiant a l'avant-bras,1,0.2
+douleur de l'epaule irradiant au bras,1,0.2
+douleur nocturne,1,0.2
+limitation des amplitudes actives,1,0.2
+arc douloureux 60-120° d'abduction,1,0.2
+arthrite asymetrique des membres inferieurs,1,0.2
+uretrite ou cervicite,1,0.2
+lesions cutanees (keratodermie),1,0.2
+oligoarthrite asymetrique,1,0.2
+arthrite interphalangienne distale,1,0.2
+dactylite,1,0.2
+spondylite,1,0.2
+aphtose buccale recidivante,1,0.2
+aphtose genitale,1,0.2
+manifestations cutanees (erytheme noueux),1,0.2
+chondrite auriculaire aigue,1,0.2
+chondrite nasale avec deformation en selle,1,0.2
+atteinte laryngo-tracheale,1,0.2
+sclero-uveite,1,0.2
+douleur thoracique anterieure,1,0.2
+tumefaction chondro-costale,1,0.2
+douleur a la palpation,1,0.2
+douleur augmentee par la respiration profonde,1,0.2
+absence de signes generaux,1,0.2
+douleurs articulaires mecaniques,1,0.2
+epanchement articulaire,1,0.2
+sensation de blocage articulaire,1,0.2
+craquements,1,0.2
+instabilite articulaire,1,0.2
+fractures multiples pour traumatismes minimes,1,0.2
+sclerotiques bleues,1,0.2
+exostoses multiples palpables,1,0.2
+deformations squelettiques,1,0.2
+inegalite de longueur des membres,1,0.2
+compressions nerveuses ou vasculaires,1,0.2
+ossification progressive des tissus mous,1,0.2
+malformations du gros orteil,1,0.2
+poussees inflammatoires douloureuses,1,0.2
+raideur articulaire progressive,1,0.2
+ankylose complete,1,0.2
+vesicules en bouquet,1,0.2
+lichenification dans les formes chroniques,1,0.2
+plaques erythemato-squameuses,1,0.2
+squames argentees adherentes,1,0.2
+"localisation coudes, genoux, cuir chevelu",1,0.2
+atteinte ungueale (depressions ponctuees),1,0.2
+papules œdemateuses (papules),1,0.2
+lesions fugaces (<24h),1,0.2
+angio-œdeme associe possible,1,0.2
+dermatographisme,1,0.2
+comedons ouverts et fermes,1,0.2
+papules inflammatoires,1,0.2
+pustules,1,0.2
+nodules kystiques,1,0.2
+cicatrices residuelles,1,0.2
+erytheme facial persistant,1,0.2
+bouffees vasomotrices,1,0.2
+papulo-pustules,1,0.2
+telangiectasies,1,0.2
+macules achromiques bien limitees,1,0.2
+"localisation peri-orificielle, extenseurs",1,0.2
+poils blancs dans les zones atteintes,1,0.2
+absence de desquamation,1,0.2
+sensibilite solaire,1,0.2
+plaques erythemateuses squameuses,1,0.2
+lesions atrophiques cicatricielles,1,0.2
+photodistribution,1,0.2
+lesions annulaires polycycliques,1,0.2
+atteinte du cuir chevelu avec alopecie,1,0.2
+lesions eczematiformes,1,0.2
+xerose cutanee,1,0.2
+localisation plis chez l'enfant,1,0.2
+desquamation dans les formes chroniques,1,0.2
+sensation de demangeaison,1,0.2
+impetiginisation,1,0.2
+retentissement sur le sommeil,1,0.2
+papules folliculaires keratosiques,1,0.2
+aspect granite de la peau,1,0.2
+"localisation faces d'extension des bras, cuisses",1,0.2
+peau seche,1,0.2
+aggravation en hiver,1,0.2
+desquamation importante,1,0.2
+epaississement cutane,1,0.2
+fissures douloureuses,1,0.2
+bulles flasques fragiles,1,0.2
+erosions cutanees douloureuses,1,0.2
+lesions buccales,1,0.2
+signe de nikolsky positif,1,0.2
+bulles tendues,1,0.2
+plaques urticariennes,1,0.2
+lesions muqueuses possibles,1,0.2
+signe de nikolsky negatif,1,0.2
+lesions en cocarde,1,0.2
+cibles cutanees typiques,1,0.2
+atteinte muqueuse variable,1,0.2
+signes generaux discrets,1,0.2
+lesions cibles atypiques,1,0.2
+decollement epidermique,1,0.2
+signes generaux intenses,1,0.2
+douleur cutanee,1,0.2
+decollement epidermique massif,1,0.2
+aspect de brulure etendue,1,0.2
+douleur intense,1,0.2
+gonflement rapide des tissus,1,0.2
+"atteinte faciale (levres, paupieres)",1,0.2
+atteinte des voies aeriennes,1,0.2
+absence de prurit,1,0.2
+douleur ou tension,1,0.2
+lesions cutanees pigmentees,1,0.2
+signe de darier positif,1,0.2
+flushs,1,0.2
+plaques erythemateuses,1,0.2
+lesions infiltrees,1,0.2
+tumefactions (mycosis),1,0.2
+squames grasses,1,0.2
+erytheme des zones seborrheiques,1,0.2
+desquamation du cuir chevelu,1,0.2
+rougeur des sillons,1,0.2
+petites vesicules profondes,1,0.2
+localisation mains et pieds,1,0.2
+desquamation en phase de guerison,1,0.2
+papules fermes en anneau,1,0.2
+bordure active,1,0.2
+centre atrophique,1,0.2
+absence de douleur ou prurit,1,0.2
+localisation dorsale des mains/pieds,1,0.2
+papules fermes rouge-brun,1,0.2
+localisation faciale,1,0.2
+evolution lente,1,0.2
+absence de douleur,1,0.2
+surface lisse,1,0.2
+papules violacees,1,0.2
+lupus pernio (lesions nasales),1,0.2
+plaques infiltrees,1,0.2
+lesions anciennes cicatricielles,1,0.2
+signes systemiques associes,1,0.2
+fragilite cutanee,1,0.2
+vesicules et bulles post-traumatiques,1,0.2
+cicatrices et milia,1,0.2
+hypertrichose faciale,1,0.2
+hyperpigmentation,1,0.2
+plaque erythemateuse atrophique,1,0.2
+peau en 'papier froisse',1,0.2
+localisation acrale,1,0.2
+sclerodermie localisee,1,0.2
+fibromes,1,0.2
+vesicules et erosions des plis,1,0.2
+lesions suintantes,1,0.2
+surinfection frequente,1,0.2
+aggravation par la chaleur et frottements,1,0.2
+papules keratosiques brunes,1,0.2
+localisation seborrheique,1,0.2
+aggravation estivale,1,0.2
+atteinte ungueale caracteristique,1,0.2
+desquamation fine,1,0.2
+aggravation hivernale,1,0.2
+pli palmaires accentues,1,0.2
+dartres resistantes,1,0.2
+bulles post-traumatiques,1,0.2
+erosions cutanees,1,0.2
+atteinte muqueuse,1,0.2
+ongles dystrophiques,1,0.2
+cicatrices atrophiques,1,0.2
+nodule perle translucide,1,0.2
+plaque crouteuse,1,0.2
+lesion qui saigne facilement,1,0.2
+cicatrice blanche atrophique,1,0.2
+masse testiculaire indolore,1,0.2
+augmentation de volume du testicule,1,0.2
+douleur testiculaire parfois,1,0.2
+gynecomastie,1,0.2
+dysphonie persistante,1,0.2
+otalgie reflexe,1,0.2
+masse des parties molles,1,0.2
+croissance rapide,1,0.2
+signes inflammatoires,1,0.2
+nodule mammaire dur,1,0.2
+retraction cutanee ou mamelonnaire,1,0.2
+ecoulement mamelonnaire,1,0.2
+modification de la peau (peau d'orange),1,0.2
+adenopathie axillaire,1,0.2
+saignements vaginaux anormaux,1,0.2
+metrorragies,1,0.2
+leucorrhees fetides,1,0.2
+saignements post-coitaux,1,0.2
+augmentation du volume abdominal,1,0.2
+saignements post-menopausiques,1,0.2
+metrorragies pre-menopausiques,1,0.2
+leucorrhees,1,0.2
+douleurs pelviennes tardives,1,0.2
+augmentation du volume uterin,1,0.2
+troubles urinaires obstructifs,1,0.2
+douleurs osseuses (metastases),1,0.2
+dysfonction erectile,1,0.2
+hematurie indolore,1,0.2
+syndrome paraneoplasique,1,0.2
+adenopathies cervicales indolores,1,0.2
+adenopathies multiples,1,0.2
+"signes generaux (fievre, amaigrissement)",1,0.2
+symptomes d'organes,1,0.2
+syndrome tumoral,1,0.2
+syndrome anemique,1,0.2
+syndrome hemorragique,1,0.2
+syndrome infectieux,1,0.2
+asymptomatique au debut,1,0.2
+fatigue par anemie,1,0.2
+hypercalcemie,1,0.2
+nævus qui change d'aspect,1,0.2
+lesion pigmentee irreguliere,1,0.2
+saignement spontane,1,0.2
+demangeaison,1,0.2
+ulceration buccale persistante,1,0.2
+masse intra-buccale,1,0.2
+douleur buccale,1,0.2
+difficulte a mastiquer,1,0.2
+douleur linguale persistante,1,0.2
+ulceration de la langue,1,0.2
+masse linguale,1,0.2
+difficulte a la mastication et deglutition,1,0.2
+dysphagie progressive,1,0.2
+douleurs retro-sternales,1,0.2
+douleurs osseuses nocturnes,1,0.2
+masse palpable,1,0.2
+fracture pathologique,1,0.2
+signes inflammatoires locaux,1,0.2
+dyspnee (metastases pulmonaires),1,0.2
+ictere (metastases hepatiques),1,0.2
+signes neurologiques (metastases cerebrales),1,0.2
+ictere obstructif progressif,1,0.2
+douleur abdominale haute,1,0.2
+obstruction intestinale,1,0.2
+saignements digestifs,1,0.2
+dyspnee d'aggravation progressive,1,0.2
+asymptomatique (decouverte fortuite),1,0.2
+syndrome cave superieur,1,0.2
+signes de myasthenie,1,0.2
+masse parotidienne ou cervicale,1,0.2
+paralysie faciale,1,0.2
+ulceration muqueuse,1,0.2
+dyspnee striduleuse,1,0.2
+wheezing localise,1,0.2
+vesicules genitales douloureuses,1,0.2
+fievre lors de la primo-infection,1,0.2
+pertes vaginales verdatres mousseuses,1,0.2
+demangeaisons vulvaires,1,0.2
+souvent asymptomatique chez l'homme,1,0.2
+demangeaisons vulvaires intenses,1,0.2
+pertes vaginales blanches grumeleuses,1,0.2
+rougeur vulvaire,1,0.2
+douleurs lors des rapports,1,0.2
+pertes vaginales laiteuses homogenes,1,0.2
+odeur de poisson caracteristique,1,0.2
+demangeaisons legeres,1,0.2
+plaques rouges squameuses,1,0.2
+bordure nette active,1,0.2
+"localisation variable (pied, aine, corps)",1,0.2
+plaques circulaires depilees,1,0.2
+parfois kerion (reaction inflammatoire),1,0.2
+taches finement squameuses,1,0.2
+depigmentation (blanches) ou hyperpigmentation (brunes),1,0.2
+localisation tronc et racines des membres,1,0.2
+legers demangeaisons,1,0.2
+vesicules devenant des croutes mielleuses,1,0.2
+plaques rouges,1,0.2
+localisation visage et membres,1,0.2
+contagiosite elevee,1,0.2
+plaque rouge chaude douloureuse,1,0.2
+lymphangite,1,0.2
+boule douloureuse fluctuante,1,0.2
+parfois fievre,1,0.2
+collection de pus,1,0.2
+masse palpable rare,1,0.2
+saignement uretral,1,0.2
+masse uretrale ou perineale,1,0.2
+ecoulement uretral,1,0.2
+retention urinaire,1,0.2
+prurit vulvaire persistant,1,0.2
+masse ou ulceration vulvaire,1,0.2
+douleur vulvaire,1,0.2
+lesion persistante du gland ou prepuce,1,0.2
+masse,1,0.2
+saignement,1,0.2
+troubles visuels (hemianopsie bitemporale),1,0.2
+deficits hormonaux,1,0.2
+hypersecretion hormonale,1,0.2
+hydrocephalie,1,0.2
+syndrome de cushing,1,0.2
+virilisation ou feminisation,1,0.2
+hypertension arterielle severe,1,0.2
+syndrome carcinoide,1,0.2
+"masse ferme, peu douloureuse",1,0.2
+croissance lente mais progressive,1,0.2
+signes compressifs selon la localisation,1,0.2
+signes d'envahissement local,1,0.2
+variable selon l'organe d'origine,1,0.2
+signes d'obstruction ou compression,1,0.2
+masse tumorale a croissance rapide,1,0.2
+alteration severe de l'etat general,1,0.2
+signes d'envahissement locoregional,1,0.2
+metastases precoces,1,0.2
+fievre elevee brutale (39-40°c),1,0.2
+eruption maculeuse a la chute de la fievre,1,0.2
+erytheme facial intense (joues giflees),1,0.2
+eruption reticulee des membres,1,0.2
+arthralgies chez l'adulte,1,0.2
+vesicules buccales douloureuses,1,0.2
+lesions papulo-vesiculeuses mains et pieds,1,0.2
+anorexie par douleur buccale,1,0.2
+parfois eruption fessiere,1,0.2
+crise tonico-clonique generalisee,1,0.2
+fievre >38°c,1,0.2
+duree generalement <15 minutes,1,0.2
+retour a un etat normal apres la crise,1,0.2
+coloration jaune de la peau et des muqueuses,1,0.2
+apparition apres 24h de vie,1,0.2
+selles colorees,1,0.2
+urines foncees si pathologique,1,0.2
+sommeil excessif,1,0.2
+douleurs abdominales paroxystiques,1,0.2
+pleurs inconsolables,1,0.2
+selles 'gelee de groseille',1,0.2
+retard staturo-ponderal,1,0.2
+selles grasses et abondantes,1,0.2
+gout sale de la peau,1,0.2
+crises douloureuses osseuses,1,0.2
+anemie chronique,1,0.2
+syndrome mains-pieds chez le nourrisson,1,0.2
+hepatosplenomegalie,1,0.2
+respiration buccale permanente,1,0.2
+ronflement nocturne,1,0.2
+voix nasonnee,1,0.2
+otites sereuses recidivantes,1,0.2
+apnees du sommeil,1,0.2
+dependance a l'oxygene au-dela de 28 jours de vie,1,0.2
+tirage,1,0.2
+geignement expiratoire,1,0.2
+deces brutal pendant le sommeil,1,0.2
+aucun signe d'alerte,1,0.2
+decouverte lors d'un check de routine,1,0.2
+paleur et cyanose,1,0.2
+enterocolite,1,0.2
+detresse respiratoire brutale,1,0.2
+œdeme de quincke,1,0.2
+urticaire generalise,1,0.2
+hypotension arterielle persistante,1,0.2
+paleur cutanee,1,0.2
+marbrures,1,0.2
+crise convulsive prolongee,1,0.2
+hyperthermie,1,0.2
+signes d'engagement cerebral,1,0.2
+respiration de kussmaul (acidocetose),1,0.2
+douleur osseuse intense,1,0.2
+impossibilite de mobiliser le membre,1,0.2
+ecoulement purulent dans les formes chroniques,1,0.2
+fievre elevee ou hypothermie,1,0.2
+hypotension,1,0.2
+embolies,1,0.2
+gene respiratoire,1,0.2
+apnees chez le jeune nourrisson,1,0.2
+diarrhee aqueuse,1,0.2
+douleurs sus-pubiennes,1,0.2
+urines troubles ou malodorantes,1,0.2
+fievre elevee avec frissons,1,0.2
+douleurs lombaires unilaterales,1,0.2
+signes urinaires associes,1,0.2
+fievre et frissons,1,0.2
+douleurs perineales ou lombaires,1,0.2
+ejaculation douloureuse,1,0.2
+douleurs faciales,1,0.2
+congestion nasale,1,0.2
+ecoulement nasal purulent,1,0.2
+diminution de l'odorat,1,0.2
+douleur d'oreille intense,1,0.2
+baisse d'audition,1,0.2
+irritabilite chez l'enfant,1,0.2
+ecoulement en cas de perforation,1,0.2
+douleur pharyngee intense,1,0.2
+amygdales rouges avec exsudat,1,0.2
+douleur pharyngee moderee,1,0.2
+rougeur de la gorge,1,0.2
+gene a la deglutition,1,0.2
+rhinite,1,0.2
+œil rouge,1,0.2
+secretions purulentes,1,0.2
+paupieres collees le matin,1,0.2
+sensation de sable,1,0.2
+gonflement des paupieres,1,0.2
+douleur unilaterale du front ou du cuir chevelu,1,0.2
+eruption vesiculeuse sur le front et la paupiere,1,0.2
+rougeur oculaire,1,0.2
+baisse d'acuite visuelle,1,0.2
+prurit anal (oxyurose),1,0.2
+anemie,1,0.2
+lesions crouteuses etendues,1,0.2
+demangeaisons parfois absentes,1,0.2
+desquamation,1,0.2
+ongles epaissis,1,0.2
+atteinte palmo-plantaire,1,0.2
+demangeaisons intenses de la region pubienne,1,0.2
+presence de lentes sur les poils,1,0.2
+taches bleutees (maculae caeruleae),1,0.2
+lesion cutanee avec orifice,1,0.2
+sensation de mouvement sous la peau,1,0.2
+ecoulement sero-purulent,1,0.2
+douleur,1,0.2
+presence de larves visibles,1,0.2
+poussees febriles brutales,1,0.2
+frissons intenses,1,0.2
+eruptions cutanees,1,0.2
+intervalle d'apparence entre les crises,1,0.2
+lesion cutanee au point d'inoculation,1,0.2
+adenopathie douloureuse,1,0.2
+"troubles visuels (vision double, floue)",1,0.2
+secheresse buccale,1,0.2
+paralysie descendante,1,0.2
+ulcere cutane au point d'inoculation,1,0.2
+fievre elevee brutale,1,0.2
+adenopathies douloureuses (bubons),1,0.2
+hemoptysie dans la forme pulmonaire,1,0.2
+choc septique,1,0.2
+endocardite dans les formes chroniques,1,0.2
+lesions cutanees angiomateuses,1,0.2
+pneumonie subaigue,1,0.2
+abces cerebraux,1,0.2
+masse inflammatoire induree,1,0.2
+fistules cutanees,1,0.2
+grains jaunatres dans les secretions,1,0.2
+douleurs locales,1,0.2
+diarrhee aqueuse chronique,1,0.2
+fievre brutale,1,0.2
+faiblesse intense,1,0.2
+chancre d'inoculation,1,0.2
+fievre intermittente,1,0.2
+deficits neurologiques focaux,1,0.2
+angine erythemateuse,1,0.2
+syndrome pseudo-grippal initial,1,0.2
+adenopathies persistantes,1,0.2
+infections opportunistes,1,0.2
+verrues genitales,1,0.2
+lesions planes du col uterin,1,0.2
+prurit nocturne intense,1,0.2
+sillons scabieux,1,0.2
+surinfection bacterienne,1,0.2
+lentes visibles sur les cheveux,1,0.2
+surinfection du cuir chevelu,1,0.2
+plaque erythemateuse aigue,1,0.2
+bord net sureleve,1,0.2
+acouphenes,1,0.2
+saignements de nez,1,0.2
+douleur thoracique constrictive intense,1,0.2
+irradiation a la machoire et au bras gauche,1,0.2
+douleur thoracique a l'effort,1,0.2
+irradiation aux bras,1,0.2
+soulagee par le repos ou la trinitrine,1,0.2
+dyspnee d'effort puis de repos,1,0.2
+prise de poids rapide,1,0.2
+fatigue importante,1,0.2
+sensation de cœur qui bat trop vite ou trop lent,1,0.2
+palpitations irregulieres,1,0.2
+douleur thoracique retrosternale augmentee a l'inspiration,1,0.2
+soulagee par l'anteflexion,1,0.2
+pericardial rub,1,0.2
+douleurs articulaires antecedentes,1,0.2
