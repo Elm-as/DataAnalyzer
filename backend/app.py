@@ -338,7 +338,7 @@ def analyze_advanced_stats():
     except Exception as e:
         return jsonify({"error": str(e), "traceback": traceback.format_exc()}), 500
 
-@app.route('/analyze/symptom-matching', methods=['POST'])
+@app.route('/analyze/symptom-matching', methods=['POST'], endpoint='analyze_symptom_matching_analysis')
 def analyze_symptom_matching():
     """Analyse de correspondance symptômes-maladies (TF-IDF + Naive Bayes)"""
     try:
@@ -356,7 +356,7 @@ def analyze_symptom_matching():
 # Stocker les analyseurs pour prédictions
 active_analyzers = {}
 
-@app.route('/analyze/symptom-matching/train', methods=['POST'])
+@app.route('/analyze/symptom-matching/train', methods=['POST'], endpoint='train_symptom_matching_model')
 def train_symptom_matching():
     """Entraîne et stocke le modèle de correspondance symptômes-maladies pour les prédictions"""
     try:
