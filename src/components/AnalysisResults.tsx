@@ -8,6 +8,7 @@ interface AnalysisResultsProps {
   results: any;
   columns: DataColumn[];
   data: any[];
+  targetColumn?: string | null;
   onPrev: () => void;
   onReset: () => void;
 }
@@ -16,6 +17,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
   results,
   columns,
   data,
+  targetColumn = null,
   onPrev,
   onReset,
 }) => {
@@ -46,6 +48,17 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
   const getDaviesBouldin = (m: any) => pick(m, ['davies_bouldin_score', 'davies_bouldin', 'db_index']);
   const getNClusters = (m: any) => pick(m, ['n_clusters', 'nClusters', 'clusters']);
   const getMAPE = (m: any) => pick(m, ['mape', 'MAPE', 'mean_absolute_percentage_error']);
+
+  const resolveBestModel = (section: any) => {
+    if (!section) return { key: null as string | null, data: null as any };
+    const keyFromSection = typeof section.best_model === 'string'
+      ? section.best_model
+      : section.best_model?.model || section.best_model?.name || null;
+    const key = keyFromSection || section.summary?.best_model || null;
+    const dataCandidate = key && section.models ? section.models[key] : null;
+    const data = dataCandidate || (typeof section.best_model === 'object' ? section.best_model : null);
+    return { key, data };
+  };
 
   if (!results) {
     return (
@@ -647,8 +660,9 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
   const renderRegression = () => {
     const data = results.analyses.regression;
     if (!data || !data.models) return <div>Aucune donnée de régression</div>;
-    const bestModelR2 = data.best_model ? Number(getR2(data.best_model)) : NaN;
-    const bestModelRMSE = data.best_model ? Number(getRMSE(data.best_model)) : NaN;
+    const { key: bestKey, data: bestData } = resolveBestModel(data);
+    const bestModelR2 = bestData ? Number(getR2(bestData)) : NaN;
+    const bestModelRMSE = bestData ? Number(getRMSE(bestData)) : NaN;
 
     return (
       <div className="space-y-6">
@@ -692,12 +706,12 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
           </div>
         </div>
 
-        {data.best_model && (
+        {bestData && (
           <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">🏆 Meilleur Modèle</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-white p-4 rounded-lg">
-                <div className="text-2xl font-bold text-green-600">{data.best_model.model}</div>
+                <div className="text-2xl font-bold text-green-600">{(bestData.model || bestKey || 'Modèle').toString()}</div>
                 <div className="text-sm text-gray-600">Modèle recommandé</div>
               </div>
               <div className="bg-white p-4 rounded-lg">
@@ -729,6 +743,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
   const renderClassification = () => {
     const data = results.analyses.classification;
     if (!data || !data.models) return <div>Aucune donnée de classification</div>;
+    const { key: bestKey, data: bestData } = resolveBestModel(data);
 
     return (
       <div className="space-y-6">
@@ -746,61 +761,66 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {Object.entries(data.models).map(([modelName, modelData]: [string, any]) => (
+                {Object.entries(data.models).map(([modelName, modelData]: [string, any]) => {
+                  const acc = Number(getAccuracy(modelData));
+                  const precision = Number(getPrecision(modelData));
+                  const recall = Number(getRecall(modelData));
+                  const f1 = Number(getF1(modelData));
+                  return (
                   <tr key={modelName} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {modelName.replace(/_/g, ' ').toUpperCase()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 rounded text-sm ${modelData.accuracy > 0.9 ? 'bg-green-100 text-green-800' : modelData.accuracy > 0.7 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>
-                        {formatPercentage(modelData.accuracy * 100)}
+                      <span className={`px-2 py-1 rounded text-sm ${acc > 0.9 ? 'bg-green-100 text-green-800' : acc > 0.7 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>
+                        {formatPercentage((acc <= 1 ? acc * 100 : acc))}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {formatPercentage(modelData.precision * 100)}
+                      {formatPercentage((precision <= 1 ? precision * 100 : precision))}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {formatPercentage(modelData.recall * 100)}
+                      {formatPercentage((recall <= 1 ? recall * 100 : recall))}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {formatPercentage(modelData.f1_score * 100)}
+                      {formatPercentage((f1 <= 1 ? f1 * 100 : f1))}
                     </td>
                   </tr>
-                ))}
+                );})}
               </tbody>
             </table>
           </div>
         </div>
 
-        {data.best_model && (
+        {bestData && (
           <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">🎯 Meilleur Classifieur</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-white p-4 rounded-lg col-span-2 md:col-span-1">
-                <div className="text-xl font-bold text-purple-600">{data.best_model.model}</div>
+                <div className="text-xl font-bold text-purple-600">{(bestData.model || bestKey || 'Modèle').toString()}</div>
                 <div className="text-sm text-gray-600">Modèle optimal</div>
               </div>
               <div className="bg-white p-4 rounded-lg">
-                <div className="text-2xl font-bold text-green-600">{formatPercentage(data.best_model.accuracy * 100)}</div>
+                <div className="text-2xl font-bold text-green-600">{formatPercentage((Number(getAccuracy(bestData)) || 0) * 100)}</div>
                 <div className="text-sm text-gray-600">Accuracy</div>
               </div>
               <div className="bg-white p-4 rounded-lg">
-                <div className="text-2xl font-bold text-blue-600">{formatPercentage(data.best_model.precision * 100)}</div>
+                <div className="text-2xl font-bold text-blue-600">{formatPercentage((Number(getPrecision(bestData)) || 0) * 100)}</div>
                 <div className="text-sm text-gray-600">Precision</div>
               </div>
               <div className="bg-white p-4 rounded-lg">
-                <div className="text-2xl font-bold text-orange-600">{formatPercentage(data.best_model.f1_score * 100)}</div>
+                <div className="text-2xl font-bold text-orange-600">{formatPercentage((Number(getF1(bestData)) || 0) * 100)}</div>
                 <div className="text-sm text-gray-600">F1-Score</div>
               </div>
             </div>
             
-            {data.best_model.confusion_matrix && (
+            {bestData?.confusion_matrix && (
               <div className="mt-4 p-4 bg-white rounded-lg">
                 <h4 className="font-semibold text-gray-900 mb-3">Matrice de Confusion</h4>
                 <div className="overflow-x-auto">
                   <table className="min-w-full border border-gray-300">
                     <tbody>
-                      {data.best_model.confusion_matrix.map((row: number[], i: number) => (
+                      {bestData.confusion_matrix.map((row: number[], i: number) => (
                         <tr key={i}>
                           {row.map((cell: number, j: number) => (
                             <td key={j} className={`border border-gray-300 p-3 text-center font-medium ${i === j ? 'bg-green-100 text-green-800' : 'bg-red-50 text-red-600'}`}>
@@ -824,6 +844,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
   const renderDiscriminant = () => {
     const data = results.analyses.discriminant;
     if (!data || !data.models) return <div>Aucune donnée d'analyse discriminante</div>;
+    const { key: bestKey, data: bestData } = resolveBestModel(data);
 
     return (
       <div className="space-y-6">
@@ -838,19 +859,19 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">Accuracy:</span>
-                    <span className="text-sm font-semibold text-gray-900">{formatPercentage(modelData.accuracy * 100)}</span>
+                    <span className="text-sm font-semibold text-gray-900">{formatPercentage((Number(getAccuracy(modelData)) || 0) * 100)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">Precision:</span>
-                    <span className="text-sm font-semibold text-gray-900">{formatPercentage(modelData.precision * 100)}</span>
+                    <span className="text-sm font-semibold text-gray-900">{formatPercentage((Number(getPrecision(modelData)) || 0) * 100)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">Recall:</span>
-                    <span className="text-sm font-semibold text-gray-900">{formatPercentage(modelData.recall * 100)}</span>
+                    <span className="text-sm font-semibold text-gray-900">{formatPercentage((Number(getRecall(modelData)) || 0) * 100)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">F1-Score:</span>
-                    <span className="text-sm font-semibold text-gray-900">{formatPercentage(modelData.f1_score * 100)}</span>
+                    <span className="text-sm font-semibold text-gray-900">{formatPercentage((Number(getF1(modelData)) || 0) * 100)}</span>
                   </div>
                 </div>
               </div>
@@ -858,11 +879,11 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
           </div>
         </div>
 
-        {data.best_model && (
+        {bestData && (
           <div className="bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-200 rounded-lg p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">🔬 Recommandation</h3>
             <p className="text-gray-700">
-              <strong>{data.best_model.model.toUpperCase()}</strong> est recommandé avec une accuracy de <strong>{formatPercentage(data.best_model.accuracy * 100)}</strong>
+              <strong>{(bestData.model || bestKey || 'modèle').toString().toUpperCase()}</strong> est recommandé avec une accuracy de <strong>{formatPercentage((Number(getAccuracy(bestData)) || 0) * 100)}</strong>
             </p>
           </div>
         )}
@@ -949,6 +970,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
   const renderTimeSeries = () => {
     const data = results.analyses.timeSeries;
     if (!data || !data.models) return <div>Aucune donnée de séries temporelles</div>;
+    const { key: bestKey, data: bestData } = resolveBestModel(data);
 
     return (
       <div className="space-y-6">
@@ -990,15 +1012,15 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
           </div>
         </div>
 
-        {data.best_model && (() => {
-          const bestMAE = Number(getMAE(data.best_model));
-          const bestMAPE = Number(getMAPE(data.best_model));
+        {bestData && (() => {
+          const bestMAE = Number(getMAE(bestData));
+          const bestMAPE = Number(getMAPE(bestData));
           return (
           <div className="bg-gradient-to-r from-cyan-50 to-blue-50 border border-cyan-200 rounded-lg p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">📈 Meilleur Modèle de Prévision</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-white p-4 rounded-lg">
-                <div className="text-xl font-bold text-cyan-600">{data.best_model.model.toUpperCase()}</div>
+                <div className="text-xl font-bold text-cyan-600">{(bestData.model || bestKey || 'Modèle').toString().toUpperCase()}</div>
                 <div className="text-sm text-gray-600">Modèle recommandé</div>
               </div>
               <div className="bg-white p-4 rounded-lg">
@@ -1020,6 +1042,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
   const renderClustering = () => {
     const data = results.analyses.clusteringAdvanced;
     if (!data || !data.models) return <div>Aucune donnée de clustering</div>;
+    const { key: bestKey, data: bestData } = resolveBestModel(data);
 
     return (
       <div className="space-y-6">
@@ -1054,14 +1077,14 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
           </div>
         </div>
 
-        {data.best_model && (() => {
-          const bmSilhouette = Number(getSilhouette(data.best_model));
-          const bmClusters = getNClusters(data.best_model);
+        {bestData && (() => {
+          const bmSilhouette = Number(getSilhouette(bestData));
+          const bmClusters = getNClusters(bestData);
           return (
           <div className="bg-gradient-to-r from-teal-50 to-green-50 border border-teal-200 rounded-lg p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">🎨 Meilleure Segmentation</h3>
             <p className="text-gray-700">
-              <strong>{data.best_model.model}</strong> avec <strong>{bmClusters} clusters</strong> et un score de silhouette de <strong>{formatNumber(bmSilhouette, 3)}</strong>
+              <strong>{(bestData.model || bestKey || 'Modèle').toString()}</strong> avec <strong>{bmClusters}</strong> clusters et un score de silhouette de <strong>{formatNumber(bmSilhouette, 3)}</strong>
             </p>
           </div>
         );})()}
@@ -1291,6 +1314,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
           results={results}
           columns={columns}
           data={data}
+          targetColumn={targetColumn}
         />
       </div>
     );

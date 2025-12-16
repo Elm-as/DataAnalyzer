@@ -49,6 +49,7 @@ function App() {
   const [helpMenuOpen, setHelpMenuOpen] = useState(false);
   const [rawData, setRawData] = useState<any[]>([]);
   const [columns, setColumns] = useState<DataColumn[]>([]);
+  const [targetColumn, setTargetColumn] = useState<string | null>(null);
   const [analysisConfig, setAnalysisConfig] = useState<AnalysisConfig>({
     descriptiveStats: true,
     correlations: true,
@@ -140,6 +141,9 @@ function App() {
                 });
                 return newRow;
               });
+              if (targetColumn && !updatedCols.find(c => c.name === targetColumn)) {
+                setTargetColumn(null);
+              }
               const newReport = DataValidator.validate(newData, updatedCols.map(c => c.name));
               setValidationReport(newReport);
             }}
@@ -166,6 +170,8 @@ function App() {
           <DataConfiguration
             columns={columns}
             onColumnsUpdated={setColumns}
+            targetColumn={targetColumn}
+            onTargetChange={setTargetColumn}
             onNext={nextStep}
             onPrev={prevStep}
           />
@@ -177,6 +183,7 @@ function App() {
             onConfigUpdated={setAnalysisConfig}
             columns={columns}
             data={rawData}
+            targetColumn={targetColumn}
             onAnalysisComplete={(results) => {
               setResults(results);
               nextStep();
@@ -190,6 +197,7 @@ function App() {
             results={results}
             columns={columns}
             data={rawData}
+            targetColumn={targetColumn}
             onPrev={prevStep}
             onReset={() => {
               setCurrentStep(0);
@@ -197,6 +205,7 @@ function App() {
               setColumns([]);
               setResults(null);
               setValidationReport(null);
+              setTargetColumn(null);
             }}
           />
         );

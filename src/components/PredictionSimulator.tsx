@@ -6,6 +6,7 @@ interface PredictionSimulatorProps {
   results: any;
   columns: DataColumn[];
   data: any[];
+  targetColumn?: string | null;
 }
 
 interface FieldStats {
@@ -21,6 +22,7 @@ const PredictionSimulator: React.FC<PredictionSimulatorProps> = ({
   results,
   columns,
   data,
+  targetColumn = null,
 }) => {
   const [inputValues, setInputValues] = useState<Record<string, any>>({});
   const [prediction, setPrediction] = useState<any>(null);
@@ -31,15 +33,18 @@ const PredictionSimulator: React.FC<PredictionSimulatorProps> = ({
   const [fieldStats, setFieldStats] = useState<Record<string, FieldStats>>({});
   const [filledCount, setFilledCount] = useState<number>(0);
   const [activeScenario, setActiveScenario] = useState<'quick' | 'typical' | 'extreme' | null>(null);
+  const targetCol = targetColumn ? columns.find(c => c.name === targetColumn) || null : null;
 
   // Détecter les modèles disponibles et le meilleur
   useEffect(() => {
     detectBestModel();
     setupAvailableFields();
-    calculateFieldStats();
-  }, [results, columns, data]);
+  }, [results, columns, data, targetColumn]);
 
   const detectBestModel = () => {
+    if (targetCol) {
+      setSelectedModel(targetCol.type === 'number' ? 'regression' : 'classification');
+    }
     if (!results?.analyses) return;
 
     const models = [];
@@ -107,23 +112,24 @@ const PredictionSimulator: React.FC<PredictionSimulatorProps> = ({
 
   const setupAvailableFields = () => {
     const selectedCols = columns.filter(col => col.isSelected);
-    
-    // Exclure seulement ID et target
     const inputFields = selectedCols.filter(col => {
       const name = col.name.toLowerCase();
-      return !name.includes('id') && 
+      return col.name !== targetColumn &&
+             !name.includes('id') &&
              !name.includes('target') &&
              col.type !== 'date';
     });
 
+    const stats = calculateFieldStats(inputFields);
     setAvailableFields(inputFields);
-    autoFillWithStats(inputFields);
+    setFieldStats(stats);
+    autoFillWithStats(inputFields, stats);
   };
 
-  const calculateFieldStats = () => {
+  const calculateFieldStats = (fields: DataColumn[]) => {
     const stats: Record<string, FieldStats> = {};
     
-    availableFields.forEach(field => {
+    fields.forEach(field => {
       const values = data
         .map(row => row[field.name])
         .filter(val => val !== null && val !== undefined && val !== '');
@@ -161,15 +167,16 @@ const PredictionSimulator: React.FC<PredictionSimulatorProps> = ({
       }
     });
 
-    setFieldStats(stats);
+    return stats;
   };
 
-  const autoFillWithStats = (fields: DataColumn[]) => {
+  const autoFillWithStats = (fields: DataColumn[], statsSource?: Record<string, FieldStats>) => {
     const defaults: Record<string, any> = {};
     let filledCount = 0;
+    const statsToUse = statsSource || fieldStats;
 
     fields.forEach(field => {
-      const stats = fieldStats[field.name];
+      const stats = statsToUse[field.name];
       
       if (field.type === 'boolean') {
         defaults[field.name] = false;
@@ -257,6 +264,72 @@ const PredictionSimulator: React.FC<PredictionSimulatorProps> = ({
     autoFillWithStats(availableFields);
     setPrediction(null);
     setActiveScenario(null);
+  };
+
+  const predictFromDataset = () => {
+    if (!targetCol || data.length === 0) return null;
+    const targetName = targetCol.name;
+
+    const scoredRows = data.map(row => {
+      let score = 0;
+      let considered = 0;
+      availableFields.forEach(field => {
+        const input = inputValues[field.name];
+        if (input === undefined || input === '') return;
+        const rowVal = row[field.name];
+        considered++;
+        if (field.type === 'number') {
+          const stats = fieldStats[field.name];
+          const range = ((stats?.max ?? 1) - (stats?.min ?? 0)) || 1;
+          const diff = Math.abs((Number(rowVal) || 0) - (Number(input) || 0)) / range;
+          score += Math.max(0, 1 - diff);
+        } else if (field.type === 'boolean') {
+          const normalizeBool = (v: any) => v === true || v === 1 || v === '1' || v === 'true';
+          score += normalizeBool(rowVal) === normalizeBool(input) ? 1 : 0;
+        } else {
+          score += rowVal && input ? (String(rowVal) === String(input) ? 1 : 0.5) : 0;
+        }
+      });
+      return { row, score: considered ? score / considered : 0 };
+    }).filter(item => item.score > 0);
+
+    if (scoredRows.length === 0) return null;
+
+    scoredRows.sort((a, b) => b.score - a.score);
+    const top = scoredRows.slice(0, Math.min(20, scoredRows.length));
+    const totalWeight = top.reduce((sum, item) => sum + item.score, 0) || 1;
+
+    if (targetCol.type === 'number') {
+      const weighted = top.reduce((sum, item) => sum + (Number(item.row[targetName]) || 0) * item.score, 0) / totalWeight;
+      const minVal = Math.min(...data.map(row => Number(row[targetName]) || 0));
+      const maxVal = Math.max(...data.map(row => Number(row[targetName]) || 0));
+      return {
+        type: 'regression',
+        predictedValue: weighted.toFixed(2),
+        r2Score: results?.analyses?.regression ? (Number(results.analyses.regression.models?.[results.analyses.regression.best_model]?.r2_score) || 0).toFixed(1) : undefined,
+        modelUsed: `Projection locale (${targetName})`,
+        range: `${minVal.toFixed(2)} à ${maxVal.toFixed(2)}`
+      };
+    }
+
+    const votes: Record<string, number> = {};
+    top.forEach(item => {
+      const key = item.row[targetName] === undefined || item.row[targetName] === null
+        ? 'Inconnu'
+        : String(item.row[targetName]);
+      votes[key] = (votes[key] || 0) + item.score;
+    });
+    const sortedVotes = Object.entries(votes).sort((a, b) => b[1] - a[1]);
+    const best = sortedVotes[0];
+    const confidence = (best?.[1] || 0) / totalWeight * 100;
+
+    return {
+      type: 'classification',
+      predictedClass: best?.[0] || 'N/A',
+      confidence: confidence.toFixed(1),
+      modelUsed: `Projection locale (${targetName})`,
+      allClasses: sortedVotes.slice(1).map(([name]) => name)
+    };
   };
 
   const getFilteredFields = () => {
@@ -368,6 +441,9 @@ const PredictionSimulator: React.FC<PredictionSimulatorProps> = ({
   };
 
   const simulatePrediction = async () => {
+    const local = predictFromDataset();
+    if (local) return local;
+
     // Pour les modèles de correspondance et symptomMatching, utiliser l'API de prédiction ML
     if (selectedModel === 'correspondance' || selectedModel === 'symptomMatching') {
       const symptomMatching = results.analyses.symptomMatching;

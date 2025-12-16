@@ -1,5 +1,5 @@
-// Configuration du backend
-const BACKEND_URL = 'http://localhost:5000';
+// Configuration du backend (surchargeable via VITE_BACKEND_URL)
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
 export const api = {
 
