@@ -356,9 +356,9 @@ def analyze_symptom_matching():
 # Stocker les analyseurs pour prédictions
 active_analyzers = {}
 
-@app.route('/analyze/symptom-matching', methods=['POST'])
-def analyze_symptom_matching():
-    """Analyse de correspondance symptômes-maladies avec stockage du modèle"""
+@app.route('/analyze/symptom-matching/train', methods=['POST'])
+def train_symptom_matching():
+    """Entraîne et stocke le modèle de correspondance symptômes-maladies pour les prédictions"""
     try:
         data = request.json
         df = pd.DataFrame(data['data'])
