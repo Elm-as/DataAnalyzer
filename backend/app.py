@@ -362,9 +362,8 @@ def train_symptom_matching():
     try:
         data = request.json
         df = pd.DataFrame(data['data'])
-        config = data['config']
+        config = data.get('config', {})
         
-        from analyses.symptom_matching import SymptomMatchingAnalyzer
         analyzer = SymptomMatchingAnalyzer(df)
         results = analyzer.perform_analysis(config)
         
