@@ -5,6 +5,8 @@ import { DataColumn } from '../App';
 interface DataConfigurationProps {
   columns: DataColumn[];
   onColumnsUpdated: (columns: DataColumn[]) => void;
+  targetColumn: string | null;
+  onTargetChange: (column: string | null) => void;
   onNext: () => void;
   onPrev: () => void;
 }
@@ -12,6 +14,8 @@ interface DataConfigurationProps {
 const DataConfiguration: React.FC<DataConfigurationProps> = ({
   columns,
   onColumnsUpdated,
+  targetColumn,
+  onTargetChange,
   onNext,
   onPrev,
 }) => {
@@ -22,6 +26,9 @@ const DataConfiguration: React.FC<DataConfigurationProps> = ({
     updatedColumns[index] = { ...updatedColumns[index], ...updates };
     setLocalColumns(updatedColumns);
     onColumnsUpdated(updatedColumns);
+    if (targetColumn && updates.isSelected === false && updatedColumns[index].name === targetColumn) {
+      onTargetChange(null);
+    }
   };
 
   const toggleColumnSelection = (index: number) => {
@@ -53,6 +60,7 @@ const DataConfiguration: React.FC<DataConfigurationProps> = ({
   };
 
   const selectedCount = localColumns.filter(col => col.isSelected).length;
+  const availableTargets = localColumns.filter(col => col.isSelected);
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
@@ -74,6 +82,29 @@ const DataConfiguration: React.FC<DataConfigurationProps> = ({
               <p className="text-sm text-blue-700">
                 Les colonnes désélectionnées seront ignorées dans les analyses
               </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4 p-4 bg-white border border-gray-200 rounded-lg">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold text-gray-900">Variable cible (pour les modèles prédictifs)</p>
+              <p className="text-xs text-gray-600">Choisissez la colonne à prédire ; les autres colonnes sélectionnées serviront de variables explicatives.</p>
+            </div>
+            <div className="w-full sm:w-64">
+              <select
+                value={targetColumn || ''}
+                onChange={(e) => onTargetChange(e.target.value || null)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white"
+              >
+                <option value="">Aucune (sélection manuelle nécessaire)</option>
+                {availableTargets.map(col => (
+                  <option key={col.name} value={col.name}>
+                    {col.name} — {col.type}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         </div>

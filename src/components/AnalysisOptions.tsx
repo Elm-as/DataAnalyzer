@@ -8,6 +8,7 @@ interface AnalysisOptionsProps {
   onConfigUpdated: (config: AnalysisConfig) => void;
   columns: DataColumn[];
   data: any[];
+  targetColumn: string | null;
   onAnalysisComplete: (results: any) => void;
   onPrev: () => void;
 }
@@ -17,6 +18,7 @@ const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
   onConfigUpdated,
   columns,
   data,
+  targetColumn,
   onAnalysisComplete,
   onPrev,
 }) => {
@@ -24,7 +26,11 @@ const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
   const [analysisProgress, setAnalysisProgress] = useState(0);
 
   const selectedColumns = columns.filter(col => col.isSelected);
+  const targetCol = targetColumn ? selectedColumns.find(col => col.name === targetColumn) || null : null;
+  const featureColumns = selectedColumns.filter(col => col.name !== targetColumn);
   const numericColumns = selectedColumns.filter(col => col.type === 'number');
+  const numericFeatures = featureColumns.filter(col => col.type === 'number' || col.type === 'boolean');
+  const categoricalFeatures = featureColumns.filter(col => col.type === 'categorical' || col.type === 'string');
   const categoricalColumns = selectedColumns.filter(col => col.type === 'categorical');
 
   const analysisTypes = [
@@ -107,7 +113,7 @@ const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
       description: 'Modèles de régression : Linéaire, Polynomial, Ridge, Lasso, ElasticNet',
       icon: TrendingUp,
       color: 'blue',
-      enabled: numericColumns.length >= 2,
+      enabled: !!targetCol && targetCol.type === 'number' && numericFeatures.length >= 1,
       estimatedTime: '~10s',
       advanced: true,
     },
@@ -117,7 +123,7 @@ const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
       description: 'KNN, SVM, Random Forest, Gradient Boosting, Decision Tree',
       icon: Target,
       color: 'green',
-      enabled: numericColumns.length >= 2 && categoricalColumns.length >= 1,
+      enabled: !!targetCol && targetCol.type !== 'number' && (numericFeatures.length + categoricalFeatures.length) >= 1,
       estimatedTime: '~12s',
       advanced: true,
     },
@@ -127,7 +133,7 @@ const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
       description: 'LDA et QDA pour classification avec réduction de dimensionalité',
       icon: Layers,
       color: 'purple',
-      enabled: numericColumns.length >= 2 && categoricalColumns.length >= 1,
+      enabled: !!targetCol && targetCol.type !== 'number' && numericFeatures.length >= 1,
       estimatedTime: '~8s',
       advanced: true,
     },
@@ -137,7 +143,7 @@ const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
       description: 'MLP, Deep Learning (CNN, RNN, LSTM) si TensorFlow disponible',
       icon: Brain,
       color: 'indigo',
-      enabled: numericColumns.length >= 2,
+      enabled: !!targetCol && featureColumns.length >= 1,
       estimatedTime: '~15s',
       advanced: true,
     },
@@ -157,7 +163,7 @@ const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
       description: 'K-Means, DBSCAN, Hierarchical, GMM avec optimisation automatique',
       icon: Network,
       color: 'orange',
-      enabled: numericColumns.length >= 2,
+      enabled: numericFeatures.length >= 2,
       estimatedTime: '~12s',
       advanced: true,
     },
@@ -177,7 +183,7 @@ const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
       description: 'Tests de normalité, t-test, ANOVA, Kruskal-Wallis, Chi-carré',
       icon: BarChart3,
       color: 'indigo',
-      enabled: numericColumns.length >= 2,
+      enabled: numericFeatures.length >= 2,
       estimatedTime: '~10s',
       advanced: true,
     },
@@ -187,7 +193,7 @@ const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
       description: 'Analyse de similarité, TF-IDF et Naive Bayes pour prédiction (fonctionne avec tout type de données)',
       icon: Stethoscope,
       color: 'pink',
-      enabled: selectedColumns.length > 10,
+      enabled: !!targetCol && featureColumns.length >= 1,
       estimatedTime: '~15s',
       advanced: true,
     },
@@ -210,6 +216,48 @@ const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
     onConfigUpdated({ ...config, [key]: !config[key] });
   };
 
+  const categoryMaps = React.useMemo(() => {
+    const maps: Record<string, Map<string, number>> = {};
+    featureColumns
+      .filter(col => col.type === 'categorical' || col.type === 'string')
+      .forEach(col => {
+        const map = new Map<string, number>();
+        const values = col.uniqueValues && col.uniqueValues.length > 0
+          ? col.uniqueValues
+          : Array.from(new Set(data.map(row => row[col.name]).filter(v => v !== undefined && v !== null)));
+        values.forEach((val, idx) => map.set(String(val), idx));
+        map.set('__missing__', values.length);
+        maps[col.name] = map;
+      });
+    return maps;
+  }, [featureColumns, data]);
+
+  const encodeValue = (value: any, col: DataColumn) => {
+    if (col.type === 'number') return Number(value) || 0;
+    if (col.type === 'boolean') return (value === true || value === 1 || value === '1' || value === 'true') ? 1 : 0;
+    const key = value === undefined || value === null || value === '' ? '__missing__' : String(value);
+    const map = categoryMaps[col.name];
+    if (map) {
+      if (!map.has(key)) {
+        map.set(key, map.size);
+      }
+      return map.get(key) ?? 0;
+    }
+    return typeof value === 'number' ? value : 0;
+  };
+
+  const prepareModelingData = () => {
+    if (!targetCol) return data;
+    return data.map(row => {
+      const prepared: Record<string, any> = {};
+      featureColumns.forEach(col => {
+        prepared[col.name] = encodeValue(row[col.name], col);
+      });
+      prepared[targetCol.name] = row[targetCol.name];
+      return prepared;
+    });
+  };
+
   const performAnalysis = async () => {
     setAnalyzing(true);
     setAnalysisProgress(0);
@@ -219,10 +267,15 @@ const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
         totalRows: data.length,
         selectedColumns: selectedColumns.length,
         numericColumns: numericColumns.length,
+        targetColumn: targetCol?.name || null,
         analysisDate: new Date().toISOString(),
       },
       analyses: {},
     };
+
+    const modelingData = prepareModelingData();
+    const featureNames = featureColumns.map(c => c.name);
+    const numericFeatureNames = numericFeatures.map(c => c.name);
 
     const enabledAnalyses = Object.entries(config).filter(([_, enabled]) => enabled);
     let completedCount = 0;
@@ -347,11 +400,10 @@ const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
         try {
           switch (analysisType) {
             case 'regression': {
-              if (numericColumns.length >= 2) {
-                const targetCol = numericColumns[numericColumns.length - 1].name;
-                const featureCols = numericColumns.filter(c => c.name !== targetCol).map(c => c.name);
-                const result = await api.regression(data, {
-                  target: targetCol,
+              if (targetCol && targetCol.type === 'number' && featureNames.length > 0) {
+                const featureCols = numericFeatureNames.length > 0 ? numericFeatureNames : featureNames;
+                const result = await api.regression(modelingData, {
+                  target: targetCol.name,
                   features: featureCols,
                   methods: ['linear', 'polynomial', 'ridge', 'lasso', 'elastic'],
                   test_size: 0.2,
@@ -362,11 +414,10 @@ const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
               break;
             }
             case 'classification': {
-              if (numericColumns.length >= 1 && categoricalColumns.length >= 1) {
-                const targetCol = categoricalColumns[0].name;
-                const featureCols = numericColumns.map(c => c.name);
-                const result = await api.classification(data, {
-                  target: targetCol,
+              if (targetCol && targetCol.type !== 'number' && featureNames.length > 0) {
+                const featureCols = numericFeatureNames.length > 0 ? numericFeatureNames : featureNames;
+                const result = await api.classification(modelingData, {
+                  target: targetCol.name,
                   features: featureCols,
                   methods: ['knn', 'svm', 'random_forest', 'gradient_boosting', 'decision_tree'],
                   test_size: 0.2,
@@ -377,12 +428,10 @@ const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
               break;
             }
             case 'discriminant': {
-              if (numericColumns.length >= 2 && categoricalColumns.length >= 1) {
-                const targetCol = categoricalColumns[0].name;
-                const featureCols = numericColumns.map(c => c.name);
-                const result = await api.discriminant(data, {
-                  target: targetCol,
-                  features: featureCols,
+              if (targetCol && targetCol.type !== 'number' && numericFeatureNames.length > 0) {
+                const result = await api.discriminant(modelingData, {
+                  target: targetCol.name,
+                  features: numericFeatureNames,
                   methods: ['lda', 'qda'],
                   test_size: 0.2,
                   cv_folds: 5,
@@ -392,12 +441,11 @@ const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
               break;
             }
             case 'neuralNetworks': {
-              if (numericColumns.length >= 2) {
-                const isClassification = categoricalColumns.length > 0;
-                const targetCol = isClassification ? categoricalColumns[0].name : numericColumns[numericColumns.length - 1].name;
-                const featureCols = numericColumns.filter(c => c.name !== targetCol).map(c => c.name);
-                const result = await api.neuralNetworks(data, {
-                  target: targetCol,
+              if (targetCol && featureNames.length > 0) {
+                const isClassification = targetCol.type !== 'number';
+                const featureCols = numericFeatureNames.length > 0 ? numericFeatureNames : featureNames;
+                const result = await api.neuralNetworks(modelingData, {
+                  target: targetCol.name,
                   features: featureCols,
                   task: isClassification ? 'classification' : 'regression',
                   models: ['mlp'],
@@ -426,10 +474,9 @@ const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
               break;
             }
             case 'advancedClustering': {
-              if (numericColumns.length >= 2) {
-                const featureCols = numericColumns.map(c => c.name);
-                const result = await api.clusteringAdvanced(data, {
-                  features: featureCols,
+              if (numericFeatureNames.length >= 2) {
+                const result = await api.clusteringAdvanced(modelingData, {
+                  features: numericFeatureNames,
                   methods: ['kmeans', 'dbscan', 'hierarchical', 'gmm'],
                   n_clusters: 3,
                   auto_optimize: true,
@@ -458,13 +505,13 @@ const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
               break;
             }
             case 'advancedStats': {
-              if (numericColumns.length >= 2) {
-                const result = await api.advancedStats(data, {
+              if (numericFeatureNames.length >= 2) {
+                const result = await api.advancedStats(modelingData, {
                   normality_tests: {
-                    columns: numericColumns.map(c => c.name),
+                    columns: numericFeatureNames,
                   },
                   correlation_tests: {
-                    columns: numericColumns.map(c => c.name),
+                    columns: numericFeatureNames,
                   },
                 });
                 results.analyses.advancedStats = result;
@@ -472,37 +519,15 @@ const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
               break;
             }
             case 'symptomMatching': {
-              // Universel: fonctionne avec tous les types de données
-              if (selectedColumns.length > 10) {
-                // Essayer de trouver une colonne "cible" (non-numérique de préférence)
-                const targetColumn = selectedColumns.find(col => col.type === 'categorical' || col.type === 'string') 
-                  || selectedColumns.find(col => col.type !== 'number')
-                  || selectedColumns[0];
-                
-                // Prendre les autres colonnes comme features
-                const featureColumns = selectedColumns.filter(col => col.name !== targetColumn.name);
-                
-                console.log('SymptomMatching - Colonnes sélectionnées:', {
-                  total: selectedColumns.length,
-                  targetColumn: targetColumn?.name,
-                  featureCount: featureColumns.length,
-                  features: featureColumns.slice(0, 5).map(c => ({ name: c.name, type: c.type }))
-                });
-                
+              if (targetCol && featureColumns.length > 0) {
                 const result = await api.symptomMatching(data, {
-                  disease_column: targetColumn?.name,
+                  disease_column: targetCol.name,
                   symptom_columns: featureColumns.map(c => c.name),
                   model: 'all',
                   test_size: 0.2,
                   top_predictions: 5,
+                  dataset_id: 'default'
                 });
-                
-                console.log('SymptomMatching - Réponse reçue:', {
-                  success: result?.success,
-                  hasAnalyses: !!result?.analyses,
-                  keys: result ? Object.keys(result) : []
-                });
-                
                 results.analyses.symptomMatching = result;
               }
               break;
@@ -838,7 +863,19 @@ const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
             <div className="text-xl sm:text-2xl font-bold text-purple-600">{numericColumns.length}</div>
             <div className="text-xs sm:text-sm text-purple-800">Colonnes numériques</div>
           </div>
+          <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
+            <div className="text-xs sm:text-sm text-indigo-800">Variable cible</div>
+            <div className="text-xl sm:text-2xl font-bold text-indigo-700 truncate">
+              {targetCol?.name || 'Aucune sélectionnée'}
+            </div>
+          </div>
         </div>
+
+        {!targetCol && (
+          <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800">
+            Sélectionnez une variable cible dans l'étape précédente pour activer les analyses prédictives (régression, classification, simulateur).
+          </div>
+        )}
       </div>
 
       {/* Boutons de sélection rapide */}
