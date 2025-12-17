@@ -338,23 +338,6 @@ def analyze_advanced_stats():
     except Exception as e:
         return jsonify({"error": str(e), "traceback": traceback.format_exc()}), 500
 
-@app.route('/analyze/symptom-matching', methods=['POST'])
-def analyze_symptom_matching():
-    """Analyse de correspondance symptômes-maladies (TF-IDF + Naive Bayes)"""
-    try:
-        data = request.json
-        df = pd.DataFrame(data['data'])
-        config = data.get('config', {})
-        
-        analyzer = SymptomMatchingAnalyzer(df)
-        results = analyzer.perform_analysis(config)
-        
-        return jsonify(results), 200
-    except Exception as e:
-        return jsonify({"error": str(e), "traceback": traceback.format_exc()}), 500
-
-# Stocker les analyseurs pour prédictions
-active_analyzers = {}
 
 @app.route('/analyze/symptom-matching', methods=['POST'])
 def analyze_symptom_matching():
@@ -490,3 +473,4 @@ if __name__ == '__main__':
         port=port,
         debug=False
     )
+
