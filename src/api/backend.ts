@@ -1,5 +1,5 @@
 // Configuration du backend
-const BACKEND_URL = 'http://localhost:5000';
+const BACKEND_URL = 'dataanalyzer.railway.internal';
 
 export const api = {
 
@@ -137,3 +137,4 @@ export const api = {
     return response.json();
   }
 };
+
