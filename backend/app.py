@@ -339,7 +339,7 @@ def analyze_advanced_stats():
         return jsonify({"error": str(e), "traceback": traceback.format_exc()}), 500
 
 @app.route('/analyze/symptom-matching', methods=['POST'], endpoint='analyze_symptom_matching_analysis')
-def analyze_symptom_matching():
+def analyze_symptom_matching_analysis():
     """Analyse de correspondance symptômes-maladies (TF-IDF + Naive Bayes)"""
     try:
         data = request.json
@@ -357,7 +357,7 @@ def analyze_symptom_matching():
 active_analyzers = {}
 
 @app.route('/analyze/symptom-matching/train', methods=['POST'], endpoint='train_symptom_matching_model')
-def train_symptom_matching():
+def train_symptom_matching_model():
     """Entraîne et stocke le modèle de correspondance symptômes-maladies pour les prédictions"""
     try:
         data = request.json
