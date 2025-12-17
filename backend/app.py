@@ -31,6 +31,7 @@ app = Flask(__name__)
 CORS(app)
 
 active_analyzers = {}
+SUMMARY_EXCLUDED_KEYS = {'data', 'features', 'target'}
 
 
 def store_analyzer(dataset_id, model_type, analyzer, config, results=None):
@@ -115,7 +116,7 @@ def _build_classification_summary(entry):
     return {
         "model_type": "classification",
         "algorithm": best_result.get('method') if best_result else None,
-        "hyperparameters": _filtered_hyperparams(config, {'data', 'features', 'target'}),
+        "hyperparameters": _filtered_hyperparams(config, SUMMARY_EXCLUDED_KEYS),
         "coefficients": coefficients,
         "feature_importance": feature_importance,
         "metrics": metrics,
@@ -137,7 +138,7 @@ def _build_regression_summary(entry):
     return {
         "model_type": "regression",
         "algorithm": best_result.get('method') if best_result else None,
-        "hyperparameters": _filtered_hyperparams(config, {'data', 'features', 'target'}),
+        "hyperparameters": _filtered_hyperparams(config, SUMMARY_EXCLUDED_KEYS),
         "coefficients": coefficients,
         "feature_importance": best_result.get('feature_importance') if best_result else None,
         "metrics": metrics,
@@ -418,13 +419,14 @@ def model_plots_classification():
         confusion = best_result.get('confusion_matrix')
         probabilities = best_result.get('probabilities_sample')
         prob_distribution = None
-        if probabilities:
+        if probabilities is not None:
             proba_array = np.array(probabilities)
-            prob_distribution = {
-                "mean": proba_array.mean(axis=0).tolist(),
-                "min": proba_array.min(axis=0).tolist(),
-                "max": proba_array.max(axis=0).tolist()
-            }
+            if proba_array.ndim == 2 and proba_array.size > 0:
+                prob_distribution = {
+                    "mean": proba_array.mean(axis=0).tolist(),
+                    "min": proba_array.min(axis=0).tolist(),
+                    "max": proba_array.max(axis=0).tolist()
+                }
         
         response = {
             "dataset_id": data.get('dataset_id'),

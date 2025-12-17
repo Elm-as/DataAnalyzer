@@ -164,7 +164,7 @@ class TimeSeriesAnalyzer:
             # Prévisions futures
             forecast_obj = fitted_model.get_forecast(steps=forecast_periods)
             future_forecast = forecast_obj.predicted_mean
-            conf_int = forecast_obj.conf_int(alpha=alpha) if hasattr(forecast_obj, "conf_int") else None
+            conf_int = forecast_obj.conf_int(alpha=alpha) if hasattr(forecast_obj, 'conf_int') else None
             
             # Résumé du modèle
             return {
@@ -234,7 +234,7 @@ class TimeSeriesAnalyzer:
             # Prévisions futures
             forecast_obj = fitted_model.get_forecast(steps=forecast_periods)
             future_forecast = forecast_obj.predicted_mean
-            conf_int = forecast_obj.conf_int(alpha=alpha) if hasattr(forecast_obj, "conf_int") else None
+            conf_int = forecast_obj.conf_int(alpha=alpha) if hasattr(forecast_obj, 'conf_int') else None
             
             return {
                 'method': f'SARIMA{order}x{seasonal_order}',
