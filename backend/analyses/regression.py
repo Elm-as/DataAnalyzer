@@ -143,7 +143,9 @@ class RegressionAnalyzer:
                 'std': float(cv_scores.std()),
                 'scores': cv_scores.tolist()
             },
-            'predictions_sample': y_pred_test[:10].tolist()
+            'predictions_sample': y_pred_test[:10].tolist(),
+            'actual_sample': y_test[:10].tolist(),
+            'residuals_sample': (y_test - y_pred_test)[:10].tolist()
         }
     
     def _polynomial_regression(self, X_train, X_test, y_train, y_test, config):
@@ -175,7 +177,9 @@ class RegressionAnalyzer:
                 'rmse': float(np.sqrt(mean_squared_error(y_test, y_pred_test))),
                 'mae': float(mean_absolute_error(y_test, y_pred_test))
             },
-            'predictions_sample': y_pred_test[:10].tolist()
+            'predictions_sample': y_pred_test[:10].tolist(),
+            'actual_sample': y_test[:10].tolist(),
+            'residuals_sample': (y_test - y_pred_test)[:10].tolist()
         }
     
     def _ridge_regression(self, X_train, X_test, y_train, y_test, config):
@@ -203,7 +207,9 @@ class RegressionAnalyzer:
                 'rmse': float(np.sqrt(mean_squared_error(y_test, y_pred_test))),
                 'mae': float(mean_absolute_error(y_test, y_pred_test))
             },
-            'predictions_sample': y_pred_test[:10].tolist()
+            'predictions_sample': y_pred_test[:10].tolist(),
+            'actual_sample': y_test[:10].tolist(),
+            'residuals_sample': (y_test - y_pred_test)[:10].tolist()
         }
     
     def _lasso_regression(self, X_train, X_test, y_train, y_test, config):
@@ -236,7 +242,9 @@ class RegressionAnalyzer:
                 'rmse': float(np.sqrt(mean_squared_error(y_test, y_pred_test))),
                 'mae': float(mean_absolute_error(y_test, y_pred_test))
             },
-            'predictions_sample': y_pred_test[:10].tolist()
+            'predictions_sample': y_pred_test[:10].tolist(),
+            'actual_sample': y_test[:10].tolist(),
+            'residuals_sample': (y_test - y_pred_test)[:10].tolist()
         }
     
     def _elastic_net_regression(self, X_train, X_test, y_train, y_test, config):
@@ -267,7 +275,9 @@ class RegressionAnalyzer:
                 'rmse': float(np.sqrt(mean_squared_error(y_test, y_pred_test))),
                 'mae': float(mean_absolute_error(y_test, y_pred_test))
             },
-            'predictions_sample': y_pred_test[:10].tolist()
+            'predictions_sample': y_pred_test[:10].tolist(),
+            'actual_sample': y_test[:10].tolist(),
+            'residuals_sample': (y_test - y_pred_test)[:10].tolist()
         }
     
     def _logistic_regression(self, X_train, X_test, y_train, y_test, config):
@@ -300,7 +310,8 @@ class RegressionAnalyzer:
             },
             'confusion_matrix': cm.tolist(),
             'predictions_sample': y_pred_test[:10].tolist(),
-            'probabilities_sample': y_pred_proba[:10].tolist()
+            'probabilities_sample': y_pred_proba[:10].tolist(),
+            'actual_sample': y_test[:10].tolist()
         }
     
     def _compare_models(self, models, is_classification):

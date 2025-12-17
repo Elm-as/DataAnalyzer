@@ -354,7 +354,8 @@ class ClassificationAnalyzer:
                 'scores': cv_scores.tolist()
             },
             'confusion_matrix': cm.tolist(),
-            'predictions_sample': y_pred_test[:10].tolist()
+            'predictions_sample': y_pred_test[:10].tolist(),
+            'classes': list(np.unique(np.concatenate([y_train, y_test])))
         }
         
         if has_proba:
