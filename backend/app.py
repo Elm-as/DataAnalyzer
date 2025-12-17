@@ -370,7 +370,7 @@ def _validate_and_get_entry(data):
 
 @app.route('/models/summary', methods=['POST'])
 def model_summary():
-    """Retourne un résumé du modèle entraîné (type, algo, hyperparamètres, métriques)."""
+    """Return a summary of the trained model (type, algorithm, hyperparameters, metrics)."""
     try:
         data = request.json or {}
         model_type = data.get('model_type')
@@ -400,7 +400,7 @@ def model_summary():
 
 @app.route('/models/plots/classification', methods=['POST'])
 def model_plots_classification():
-    """Renvoie des données de visualisation pour les modèles de classification."""
+    """Return visualization payloads for classification models."""
     try:
         data = request.json or {}
         entry, error_resp, status = _validate_and_get_entry(data)
@@ -432,7 +432,7 @@ def model_plots_classification():
             "plots": {
                 "confusion_matrix": confusion,
                 "probability_distribution": prob_distribution,
-                "decision_boundary": None  # Peut être généré côté frontend si nécessaire (2D)
+                "decision_boundary": None  # Can be generated on the frontend if needed (2D)
             }
         }
         return jsonify(_normalize_payload(response)), 200
@@ -442,7 +442,7 @@ def model_plots_classification():
 
 @app.route('/models/plots/regression', methods=['POST'])
 def model_plots_regression():
-    """Renvoie des données de visualisation pour les modèles de régression."""
+    """Return visualization payloads for regression models."""
     try:
         data = request.json or {}
         entry, error_resp, status = _validate_and_get_entry(data)
@@ -475,7 +475,7 @@ def model_plots_regression():
 
 @app.route('/models/plots/time-series', methods=['POST'])
 def model_plots_time_series():
-    """Renvoie des données de visualisation pour les modèles de séries temporelles."""
+    """Return visualization payloads for time series models."""
     try:
         data = request.json or {}
         entry, error_resp, status = _validate_and_get_entry(data)
