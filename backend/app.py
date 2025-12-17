@@ -79,12 +79,17 @@ def _normalize_payload(payload):
     if isinstance(payload, list):
         return [_normalize_payload(v) for v in payload]
     if isinstance(payload, tuple):
-        return tuple(_normalize_payload(list(payload)))
+        return tuple(_normalize_payload(item) for item in payload)
     if isinstance(payload, (np.integer, np.floating)):
         return payload.item()
     if isinstance(payload, np.ndarray):
         return payload.tolist()
     return payload
+
+
+def _filtered_hyperparams(config, excluded_keys):
+    """Return hyperparameters without non-relevant config entries."""
+    return {k: v for k, v in (config or {}).items() if k not in excluded_keys}
 
 
 def _build_classification_summary(entry):
@@ -97,12 +102,20 @@ def _build_classification_summary(entry):
     metrics = best_result.get('test_metrics') if best_result else None
     feature_importance = best_result.get('feature_importance') if best_result else None
     coefficients = best_result.get('coefficients') if best_result else None
-    num_classes = len(best_result.get('confusion_matrix', [])) if best_result else None
+    if best_result:
+        if best_result.get('classes'):
+            num_classes = len(best_result.get('classes'))
+        elif best_result.get('confusion_matrix'):
+            num_classes = len(best_result.get('confusion_matrix'))
+        else:
+            num_classes = None
+    else:
+        num_classes = None
     
     return {
         "model_type": "classification",
         "algorithm": best_result.get('method') if best_result else None,
-        "hyperparameters": {k: v for k, v in config.items() if k != 'data'},
+        "hyperparameters": _filtered_hyperparams(config, {'data', 'features', 'target'}),
         "coefficients": coefficients,
         "feature_importance": feature_importance,
         "metrics": metrics,
@@ -124,7 +137,7 @@ def _build_regression_summary(entry):
     return {
         "model_type": "regression",
         "algorithm": best_result.get('method') if best_result else None,
-        "hyperparameters": {k: v for k, v in config.items() if k != 'data'},
+        "hyperparameters": _filtered_hyperparams(config, {'data', 'features', 'target'}),
         "coefficients": coefficients,
         "feature_importance": best_result.get('feature_importance') if best_result else None,
         "metrics": metrics,
@@ -348,10 +361,10 @@ def analyze_basic():
 def _validate_and_get_entry(data):
     dataset_id = data.get('dataset_id')
     if not dataset_id:
-        return None, jsonify({"error": "Le champ dataset_id est requis"}), 400
+        return None, jsonify({"error": "The dataset_id field is required"}), 400
     entry = _get_analyzer_entry(dataset_id)
     if entry is None:
-        return None, jsonify({"error": f"Aucun modèle stocké pour {dataset_id}"}), 404
+        return None, jsonify({"error": f"No model stored for dataset {dataset_id}"}), 404
     return entry, None, None
 
 
@@ -362,14 +375,14 @@ def model_summary():
         data = request.json or {}
         model_type = data.get('model_type')
         if model_type not in ['classification', 'regression', 'time_series']:
-            return jsonify({"error": "Le paramètre model_type doit être classification, regression ou time_series"}), 400
+            return jsonify({"error": "model_type must be classification, regression or time_series"}), 400
         
         entry, error_resp, status = _validate_and_get_entry(data)
         if error_resp:
             return error_resp, status
         
         if entry.get('model_type') != model_type:
-            return jsonify({"error": f"Le modèle stocké est de type {entry.get('model_type')} et non {model_type}"}), 400
+            return jsonify({"error": f"Stored model type is {entry.get('model_type')} not {model_type}"}), 400
         
         if model_type == 'classification':
             summary = _build_classification_summary(entry)
@@ -394,13 +407,13 @@ def model_plots_classification():
         if error_resp:
             return error_resp, status
         if entry.get('model_type') != 'classification':
-            return jsonify({"error": "Aucun modèle de classification pour ce dataset"}), 400
+            return jsonify({"error": "No classification model available for this dataset"}), 400
         
         results = entry.get('results') or {}
         models = results.get('models', {})
         best_result = _select_best_model(models, results.get('summary', {}).get('best_model'))
         if not best_result:
-            return jsonify({"error": "Aucun résultat de modèle disponible"}), 400
+            return jsonify({"error": "No model result available"}), 400
         
         confusion = best_result.get('confusion_matrix')
         probabilities = best_result.get('probabilities_sample')
@@ -436,13 +449,13 @@ def model_plots_regression():
         if error_resp:
             return error_resp, status
         if entry.get('model_type') != 'regression':
-            return jsonify({"error": "Aucun modèle de régression pour ce dataset"}), 400
+            return jsonify({"error": "No regression model available for this dataset"}), 400
         
         results = entry.get('results') or {}
         models = results.get('models', {})
         best_result = _select_best_model(models, results.get('summary', {}).get('best_model'))
         if not best_result:
-            return jsonify({"error": "Aucun résultat de modèle disponible"}), 400
+            return jsonify({"error": "No model result available"}), 400
         
         response = {
             "dataset_id": data.get('dataset_id'),
@@ -469,13 +482,13 @@ def model_plots_time_series():
         if error_resp:
             return error_resp, status
         if entry.get('model_type') != 'time_series':
-            return jsonify({"error": "Aucun modèle de série temporelle pour ce dataset"}), 400
+            return jsonify({"error": "No time series model available for this dataset"}), 400
         
         results = entry.get('results') or {}
         models = results.get('models', {})
         best_result = _select_best_model(models, results.get('summary', {}).get('best_model'))
         if not best_result:
-            return jsonify({"error": "Aucun résultat de modèle disponible"}), 400
+            return jsonify({"error": "No model result available"}), 400
         
         response = {
             "dataset_id": data.get('dataset_id'),

@@ -132,6 +132,7 @@ class TimeSeriesAnalyzer:
         """Modèle ARIMA"""
         order = config.get('arima_order', (1, 1, 1))
         forecast_periods = config.get('forecast_periods', 30)
+        alpha = config.get('forecast_alpha', 0.05)
         
         try:
             # Entraînement
@@ -163,7 +164,7 @@ class TimeSeriesAnalyzer:
             # Prévisions futures
             forecast_obj = fitted_model.get_forecast(steps=forecast_periods)
             future_forecast = forecast_obj.predicted_mean
-            conf_int = forecast_obj.conf_int(alpha=0.05) if hasattr(forecast_obj, "conf_int") else None
+            conf_int = forecast_obj.conf_int(alpha=alpha) if hasattr(forecast_obj, "conf_int") else None
             
             # Résumé du modèle
             return {
@@ -201,6 +202,7 @@ class TimeSeriesAnalyzer:
         order = config.get('sarima_order', (1, 1, 1))
         seasonal_order = config.get('sarima_seasonal_order', (1, 1, 1, 12))
         forecast_periods = config.get('forecast_periods', 30)
+        alpha = config.get('forecast_alpha', 0.05)
         
         try:
             # Entraînement
@@ -232,7 +234,7 @@ class TimeSeriesAnalyzer:
             # Prévisions futures
             forecast_obj = fitted_model.get_forecast(steps=forecast_periods)
             future_forecast = forecast_obj.predicted_mean
-            conf_int = forecast_obj.conf_int(alpha=0.05) if hasattr(forecast_obj, "conf_int") else None
+            conf_int = forecast_obj.conf_int(alpha=alpha) if hasattr(forecast_obj, "conf_int") else None
             
             return {
                 'method': f'SARIMA{order}x{seasonal_order}',
