@@ -74,13 +74,17 @@ def _select_best_model(models, best_model_name):
 
 def _normalize_payload(payload):
     """Convert numpy types to JSON serializable Python primitives."""
-    def _convert(o):
-        if isinstance(o, (np.integer, np.floating)):
-            return o.item()
-        if isinstance(o, np.ndarray):
-            return o.tolist()
-        return o
-    return json.loads(json.dumps(payload, default=_convert))
+    if isinstance(payload, dict):
+        return {k: _normalize_payload(v) for k, v in payload.items()}
+    if isinstance(payload, list):
+        return [_normalize_payload(v) for v in payload]
+    if isinstance(payload, tuple):
+        return tuple(_normalize_payload(list(payload)))
+    if isinstance(payload, (np.integer, np.floating)):
+        return payload.item()
+    if isinstance(payload, np.ndarray):
+        return payload.tolist()
+    return payload
 
 
 def _build_classification_summary(entry):
@@ -344,7 +348,7 @@ def analyze_basic():
 def _validate_and_get_entry(data):
     dataset_id = data.get('dataset_id')
     if not dataset_id:
-        return None, jsonify({"error": "dataset_id requis"}), 400
+        return None, jsonify({"error": "Le champ dataset_id est requis"}), 400
     entry = _get_analyzer_entry(dataset_id)
     if entry is None:
         return None, jsonify({"error": f"Aucun modèle stocké pour {dataset_id}"}), 404
@@ -358,7 +362,7 @@ def model_summary():
         data = request.json or {}
         model_type = data.get('model_type')
         if model_type not in ['classification', 'regression', 'time_series']:
-            return jsonify({"error": "model_type doit être classification|regression|time_series"}), 400
+            return jsonify({"error": "Le paramètre model_type doit être classification, regression ou time_series"}), 400
         
         entry, error_resp, status = _validate_and_get_entry(data)
         if error_resp:
