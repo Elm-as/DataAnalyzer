@@ -5,7 +5,7 @@ import numpy as np
 import json
 import io
 import traceback
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 
 # Import analysis modules
@@ -29,6 +29,149 @@ except ImportError:
 
 app = Flask(__name__)
 CORS(app)
+
+active_analyzers = {}
+SUMMARY_EXCLUDED_KEYS = {'data', 'features', 'target'}
+
+
+def store_analyzer(dataset_id, model_type, analyzer, config, results=None):
+    """Persist trained analyzer and metadata in memory."""
+    active_analyzers[dataset_id] = {
+        "model_type": model_type,
+        "analyzer": analyzer,
+        "config": config,
+        "results": results,
+        "trained_at": datetime.now(timezone.utc).isoformat()
+    }
+
+
+def _get_analyzer_entry(dataset_id):
+    """Return normalized analyzer entry for a dataset_id."""
+    if dataset_id not in active_analyzers:
+        return None
+    entry = active_analyzers[dataset_id]
+    if isinstance(entry, dict) and "analyzer" in entry:
+        return entry
+    # Backward compatibility for stored analyzer objects
+    return {
+        "model_type": getattr(entry, "model_type", None) or "symptom_matching",
+        "analyzer": entry,
+        "config": getattr(entry, "config", {}),
+        "results": getattr(entry, "results", None),
+        "trained_at": None
+    }
+
+
+def _select_best_model(models, best_model_name):
+    """Find the best model result based on provided name."""
+    if not models:
+        return None
+    for result in models.values():
+        if result.get('method') == best_model_name:
+            return result
+    # Fallback to first result
+    return next(iter(models.values()))
+
+
+def _normalize_payload(payload):
+    """Convert numpy types to JSON serializable Python primitives."""
+    if isinstance(payload, dict):
+        return {k: _normalize_payload(v) for k, v in payload.items()}
+    if isinstance(payload, list):
+        return [_normalize_payload(v) for v in payload]
+    if isinstance(payload, tuple):
+        return tuple(_normalize_payload(item) for item in payload)
+    if isinstance(payload, (np.integer, np.floating)):
+        return payload.item()
+    if isinstance(payload, np.ndarray):
+        return payload.tolist()
+    return payload
+
+
+def _filtered_hyperparams(config, excluded_keys):
+    """Return hyperparameters without non-relevant config entries."""
+    return {k: v for k, v in (config or {}).items() if k not in excluded_keys}
+
+
+def _build_classification_summary(entry):
+    results = entry.get('results') or {}
+    config = entry.get('config') or {}
+    models = results.get('models', {})
+    best_model_name = results.get('summary', {}).get('best_model')
+    best_result = _select_best_model(models, best_model_name)
+    
+    metrics = best_result.get('test_metrics') if best_result else None
+    feature_importance = best_result.get('feature_importance') if best_result else None
+    coefficients = best_result.get('coefficients') if best_result else None
+    if best_result:
+        if best_result.get('classes'):
+            num_classes = len(best_result.get('classes'))
+        elif best_result.get('confusion_matrix'):
+            num_classes = len(best_result.get('confusion_matrix'))
+        else:
+            num_classes = None
+    else:
+        num_classes = None
+    
+    return {
+        "model_type": "classification",
+        "algorithm": best_result.get('method') if best_result else None,
+        "hyperparameters": _filtered_hyperparams(config, SUMMARY_EXCLUDED_KEYS),
+        "coefficients": coefficients,
+        "feature_importance": feature_importance,
+        "metrics": metrics,
+        "n_features": len(config.get('features', [])),
+        "n_classes": num_classes
+    }
+
+
+def _build_regression_summary(entry):
+    results = entry.get('results') or {}
+    config = entry.get('config') or {}
+    models = results.get('models', {})
+    best_model_name = results.get('summary', {}).get('best_model')
+    best_result = _select_best_model(models, best_model_name)
+    
+    metrics = best_result.get('test_metrics') if best_result else None
+    coefficients = best_result.get('coefficients') if best_result else None
+    
+    return {
+        "model_type": "regression",
+        "algorithm": best_result.get('method') if best_result else None,
+        "hyperparameters": _filtered_hyperparams(config, SUMMARY_EXCLUDED_KEYS),
+        "coefficients": coefficients,
+        "feature_importance": best_result.get('feature_importance') if best_result else None,
+        "metrics": metrics,
+        "n_features": len(config.get('features', [])),
+        "n_classes": None
+    }
+
+
+def _build_time_series_summary(entry):
+    results = entry.get('results') or {}
+    models = results.get('models', {})
+    best_model_name = results.get('summary', {}).get('best_model')
+    best_result = _select_best_model(models, best_model_name)
+    
+    metrics = best_result.get('test_metrics') if best_result else None
+    hyperparams = {}
+    if best_result:
+        if 'order' in best_result:
+            hyperparams['order'] = best_result['order']
+        if 'seasonal_order' in best_result:
+            hyperparams['seasonal_order'] = best_result['seasonal_order']
+    
+    return {
+        "model_type": "time_series",
+        "algorithm": best_result.get('method') if best_result else None,
+        "hyperparameters": hyperparams,
+        "coefficients": None,
+        "feature_importance": None,
+        "metrics": metrics,
+        "n_features": 1,
+        "n_classes": None
+    }
+
 
 @app.route('/health', methods=['GET'])
 def health_check():
@@ -215,6 +358,156 @@ def analyze_basic():
     except Exception as e:
         return jsonify({"error": str(e), "traceback": traceback.format_exc()}), 500
 
+
+def _validate_and_get_entry(data):
+    dataset_id = data.get('dataset_id')
+    if not dataset_id:
+        return None, jsonify({"error": "The dataset_id field is required"}), 400
+    entry = _get_analyzer_entry(dataset_id)
+    if entry is None:
+        return None, jsonify({"error": f"No model stored for dataset {dataset_id}"}), 404
+    return entry, None, None
+
+
+@app.route('/models/summary', methods=['POST'])
+def model_summary():
+    """Return a summary of the trained model (type, algorithm, hyperparameters, metrics)."""
+    try:
+        data = request.json or {}
+        model_type = data.get('model_type')
+        if model_type not in ['classification', 'regression', 'time_series']:
+            return jsonify({"error": "model_type must be classification, regression or time_series"}), 400
+        
+        entry, error_resp, status = _validate_and_get_entry(data)
+        if error_resp:
+            return error_resp, status
+        
+        if entry.get('model_type') != model_type:
+            return jsonify({"error": f"Stored model type is {entry.get('model_type')} not {model_type}"}), 400
+        
+        if model_type == 'classification':
+            summary = _build_classification_summary(entry)
+        elif model_type == 'regression':
+            summary = _build_regression_summary(entry)
+        else:
+            summary = _build_time_series_summary(entry)
+        
+        summary['dataset_id'] = data.get('dataset_id')
+        summary['trained_at'] = entry.get('trained_at')
+        return jsonify(_normalize_payload(summary)), 200
+    except Exception as e:
+        return jsonify({"error": str(e), "traceback": traceback.format_exc()}), 500
+
+
+@app.route('/models/plots/classification', methods=['POST'])
+def model_plots_classification():
+    """Return visualization payloads for classification models."""
+    try:
+        data = request.json or {}
+        entry, error_resp, status = _validate_and_get_entry(data)
+        if error_resp:
+            return error_resp, status
+        if entry.get('model_type') != 'classification':
+            return jsonify({"error": "No classification model available for this dataset"}), 400
+        
+        results = entry.get('results') or {}
+        models = results.get('models', {})
+        best_result = _select_best_model(models, results.get('summary', {}).get('best_model'))
+        if not best_result:
+            return jsonify({"error": "No model result available"}), 400
+        
+        confusion = best_result.get('confusion_matrix')
+        probabilities = best_result.get('probabilities_sample')
+        prob_distribution = None
+        if probabilities is not None:
+            proba_array = np.array(probabilities)
+            if proba_array.ndim == 2 and proba_array.size > 0:
+                prob_distribution = {
+                    "mean": proba_array.mean(axis=0).tolist(),
+                    "min": proba_array.min(axis=0).tolist(),
+                    "max": proba_array.max(axis=0).tolist()
+                }
+        
+        response = {
+            "dataset_id": data.get('dataset_id'),
+            "model": best_result.get('method'),
+            "plots": {
+                "confusion_matrix": confusion,
+                "probability_distribution": prob_distribution,
+                "decision_boundary": None  # Can be generated on the frontend if needed (2D)
+            }
+        }
+        return jsonify(_normalize_payload(response)), 200
+    except Exception as e:
+        return jsonify({"error": str(e), "traceback": traceback.format_exc()}), 500
+
+
+@app.route('/models/plots/regression', methods=['POST'])
+def model_plots_regression():
+    """Return visualization payloads for regression models."""
+    try:
+        data = request.json or {}
+        entry, error_resp, status = _validate_and_get_entry(data)
+        if error_resp:
+            return error_resp, status
+        if entry.get('model_type') != 'regression':
+            return jsonify({"error": "No regression model available for this dataset"}), 400
+        
+        results = entry.get('results') or {}
+        models = results.get('models', {})
+        best_result = _select_best_model(models, results.get('summary', {}).get('best_model'))
+        if not best_result:
+            return jsonify({"error": "No model result available"}), 400
+        
+        response = {
+            "dataset_id": data.get('dataset_id'),
+            "model": best_result.get('method'),
+            "plots": {
+                "predicted_vs_actual": {
+                    "predicted": best_result.get('predictions_sample'),
+                    "actual": best_result.get('actual_sample')
+                },
+                "residuals": best_result.get('residuals_sample')
+            }
+        }
+        return jsonify(_normalize_payload(response)), 200
+    except Exception as e:
+        return jsonify({"error": str(e), "traceback": traceback.format_exc()}), 500
+
+
+@app.route('/models/plots/time-series', methods=['POST'])
+def model_plots_time_series():
+    """Return visualization payloads for time series models."""
+    try:
+        data = request.json or {}
+        entry, error_resp, status = _validate_and_get_entry(data)
+        if error_resp:
+            return error_resp, status
+        if entry.get('model_type') != 'time_series':
+            return jsonify({"error": "No time series model available for this dataset"}), 400
+        
+        results = entry.get('results') or {}
+        models = results.get('models', {})
+        best_result = _select_best_model(models, results.get('summary', {}).get('best_model'))
+        if not best_result:
+            return jsonify({"error": "No model result available"}), 400
+        
+        response = {
+            "dataset_id": data.get('dataset_id'),
+            "model": best_result.get('method'),
+            "plots": {
+                "observed_vs_predicted": {
+                    "actual": best_result.get('test_actual'),
+                    "predicted": best_result.get('test_predictions'),
+                    "index": best_result.get('test_index')
+                },
+                "forecast": best_result.get('forecast')
+            }
+        }
+        return jsonify(_normalize_payload(response)), 200
+    except Exception as e:
+        return jsonify({"error": str(e), "traceback": traceback.format_exc()}), 500
+
 @app.route('/analyze/regression', methods=['POST'])
 def analyze_regression():
     """Analyse de régression (linéaire, polynomiale, logistique, Ridge, Lasso)"""
@@ -222,11 +515,14 @@ def analyze_regression():
         data = request.json
         df = pd.DataFrame(data['data'])
         config = data['config']
+        dataset_id = data.get('dataset_id', 'default')
         
         analyzer = RegressionAnalyzer(df)
         results = analyzer.perform_analysis(config)
+        store_analyzer(dataset_id, 'regression', analyzer, config, results)
         
-        return jsonify(results), 200
+        response = {"dataset_id": dataset_id, **results}
+        return jsonify(_normalize_payload(response)), 200
     except Exception as e:
         return jsonify({"error": str(e), "traceback": traceback.format_exc()}), 500
 
@@ -237,11 +533,14 @@ def analyze_classification():
         data = request.json
         df = pd.DataFrame(data['data'])
         config = data['config']
+        dataset_id = data.get('dataset_id', 'default')
         
         analyzer = ClassificationAnalyzer(df)
         results = analyzer.perform_analysis(config)
+        store_analyzer(dataset_id, 'classification', analyzer, config, results)
         
-        return jsonify(results), 200
+        response = {"dataset_id": dataset_id, **results}
+        return jsonify(_normalize_payload(response)), 200
     except Exception as e:
         return jsonify({"error": str(e), "traceback": traceback.format_exc()}), 500
 
@@ -282,11 +581,14 @@ def analyze_time_series():
         data = request.json
         df = pd.DataFrame(data['data'])
         config = data['config']
+        dataset_id = data.get('dataset_id', 'default')
         
         analyzer = TimeSeriesAnalyzer(df)
         results = analyzer.perform_analysis(config)
+        store_analyzer(dataset_id, 'time_series', analyzer, config, results)
         
-        return jsonify(results), 200
+        response = {"dataset_id": dataset_id, **results}
+        return jsonify(_normalize_payload(response)), 200
     except Exception as e:
         return jsonify({"error": str(e), "traceback": traceback.format_exc()}), 500
 
@@ -364,12 +666,13 @@ def train_symptom_matching_model():
         df = pd.DataFrame(data['data'])
         config = data.get('config', {})
         
+        from analyses.symptom_matching import SymptomMatchingAnalyzer
         analyzer = SymptomMatchingAnalyzer(df)
         results = analyzer.perform_analysis(config)
         
         # Stocker l'analyzer pour prédictions futures
         dataset_id = data.get('dataset_id', 'default')
-        active_analyzers[dataset_id] = analyzer
+        store_analyzer(dataset_id, 'symptom_matching', analyzer, config, results)
         
         print(f"[BACKEND] Analyzer stocké pour dataset {dataset_id}")
         print(f"  - Modèle: {type(analyzer.trained_model)}")
@@ -413,10 +716,11 @@ def predict():
         features = data.get('features', {})
         
         # Récupérer l'analyzer
-        if dataset_id not in active_analyzers:
+        analyzer_entry = _get_analyzer_entry(dataset_id)
+        if analyzer_entry is None:
             return jsonify({"error": f"Aucun modèle entraîné pour dataset {dataset_id}. Lancez d'abord une analyse."}), 400
         
-        analyzer = active_analyzers[dataset_id]
+        analyzer = analyzer_entry.get('analyzer')
         
         if analyzer.trained_model is None:
             return jsonify({"error": "Aucun modèle ML entraîné. Relancez l'analyse avec model='bernoulli' ou 'all'."}), 400

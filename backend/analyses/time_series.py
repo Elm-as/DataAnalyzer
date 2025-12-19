@@ -132,6 +132,7 @@ class TimeSeriesAnalyzer:
         """Modèle ARIMA"""
         order = config.get('arima_order', (1, 1, 1))
         forecast_periods = config.get('forecast_periods', 30)
+        alpha = config.get('forecast_alpha', 0.05)
         
         try:
             # Entraînement
@@ -154,12 +155,16 @@ class TimeSeriesAnalyzer:
                     'mae': float(mae),
                     'mape': float(mape)
                 }
+                test_index = test.index.astype(str).tolist()
             else:
                 predictions = None
                 test_metrics = None
+                test_index = None
             
             # Prévisions futures
-            future_forecast = fitted_model.forecast(steps=forecast_periods)
+            forecast_obj = fitted_model.get_forecast(steps=forecast_periods)
+            future_forecast = forecast_obj.predicted_mean
+            conf_int = forecast_obj.conf_int(alpha=alpha) if hasattr(forecast_obj, 'conf_int') else None
             
             # Résumé du modèle
             return {
@@ -168,8 +173,13 @@ class TimeSeriesAnalyzer:
                 'aic': float(fitted_model.aic),
                 'bic': float(fitted_model.bic),
                 'test_metrics': test_metrics,
+                'test_predictions': predictions.tolist() if predictions is not None else None,
+                'test_actual': test.tolist() if test is not None else None,
+                'test_index': test_index,
                 'forecast': {
                     'values': future_forecast.tolist(),
+                    'lower_bound': conf_int.iloc[:, 0].tolist() if conf_int is not None else None,
+                    'upper_bound': conf_int.iloc[:, 1].tolist() if conf_int is not None else None,
                     'periods': forecast_periods
                 },
                 'model_summary': {
@@ -192,6 +202,7 @@ class TimeSeriesAnalyzer:
         order = config.get('sarima_order', (1, 1, 1))
         seasonal_order = config.get('sarima_seasonal_order', (1, 1, 1, 12))
         forecast_periods = config.get('forecast_periods', 30)
+        alpha = config.get('forecast_alpha', 0.05)
         
         try:
             # Entraînement
@@ -214,12 +225,16 @@ class TimeSeriesAnalyzer:
                     'mae': float(mae),
                     'mape': float(mape)
                 }
+                test_index = test.index.astype(str).tolist()
             else:
                 predictions = None
                 test_metrics = None
+                test_index = None
             
             # Prévisions futures
-            future_forecast = fitted_model.forecast(steps=forecast_periods)
+            forecast_obj = fitted_model.get_forecast(steps=forecast_periods)
+            future_forecast = forecast_obj.predicted_mean
+            conf_int = forecast_obj.conf_int(alpha=alpha) if hasattr(forecast_obj, 'conf_int') else None
             
             return {
                 'method': f'SARIMA{order}x{seasonal_order}',
@@ -228,8 +243,13 @@ class TimeSeriesAnalyzer:
                 'aic': float(fitted_model.aic),
                 'bic': float(fitted_model.bic),
                 'test_metrics': test_metrics,
+                'test_predictions': predictions.tolist() if predictions is not None else None,
+                'test_actual': test.tolist() if test is not None else None,
+                'test_index': test_index,
                 'forecast': {
                     'values': future_forecast.tolist(),
+                    'lower_bound': conf_int.iloc[:, 0].tolist() if conf_int is not None else None,
+                    'upper_bound': conf_int.iloc[:, 1].tolist() if conf_int is not None else None,
                     'periods': forecast_periods
                 },
                 'model_summary': {
