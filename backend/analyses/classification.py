@@ -26,6 +26,124 @@ except ImportError:
 class ClassificationAnalyzer:
     def __init__(self, df):
         self.df = df
+
+        # Pour /predict (runtime)
+        self.model_type = 'classification'
+        self._encoded_feature_columns = None
+        self._original_feature_columns = None
+        self._predict_scaler = None
+        self._predict_model = None
+        self._best_model_key = None
+        self._target_column = None
+        self._label_encoder = None
+        self._class_names = None
+
+    def _encode_features(self, X_raw: pd.DataFrame) -> pd.DataFrame:
+        """Encode les features en numérique (bool/date/catégoriel) et gère les NA."""
+        X = X_raw.copy()
+
+        for col in X.columns:
+            if X[col].dtype == bool:
+                X[col] = X[col].astype(int)
+                continue
+
+            if np.issubdtype(X[col].dtype, np.datetime64):
+                X[col] = X[col].view('int64')
+                continue
+
+            if X[col].dtype == object:
+                parsed = pd.to_datetime(X[col], errors='ignore', utc=True)
+                if np.issubdtype(parsed.dtype, np.datetime64):
+                    X[col] = parsed.view('int64')
+
+        non_numeric = [c for c in X.columns if not np.issubdtype(X[c].dtype, np.number)]
+        if non_numeric:
+            X = pd.get_dummies(X, columns=non_numeric, dummy_na=True)
+
+        X = X.apply(pd.to_numeric, errors='coerce')
+        X = X.fillna(X.mean(numeric_only=True)).fillna(0)
+        return X
+
+    def _train_predictor(self, method_key: str, X_encoded: pd.DataFrame, y_encoded: np.ndarray, config: dict):
+        self._encoded_feature_columns = X_encoded.columns.tolist()
+        self._original_feature_columns = list(config.get('features', []))
+        self._target_column = config.get('target')
+        self._best_model_key = method_key
+
+        # Standardisation (utile pour knn/svm/nb). Pour les arbres, ça ne gêne pas.
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X_encoded.values)
+
+        if method_key == 'knn':
+            model = KNeighborsClassifier(n_neighbors=config.get('knn_neighbors', 5))
+            model.fit(X_scaled, y_encoded)
+        elif method_key == 'svm':
+            model = SVC(kernel=config.get('svm_kernel', 'rbf'), C=config.get('svm_C', 1.0), probability=True)
+            model.fit(X_scaled, y_encoded)
+        elif method_key == 'random_forest':
+            model = RandomForestClassifier(
+                n_estimators=config.get('rf_n_estimators', 100),
+                max_depth=config.get('rf_max_depth', None),
+                random_state=42,
+                n_jobs=-1
+            )
+            model.fit(X_encoded.values, y_encoded)
+            scaler = None
+        elif method_key == 'decision_tree':
+            model = DecisionTreeClassifier(max_depth=config.get('dt_max_depth', None), random_state=42)
+            model.fit(X_encoded.values, y_encoded)
+            scaler = None
+        elif method_key == 'gradient_boosting':
+            model = GradientBoostingClassifier(
+                n_estimators=config.get('gb_n_estimators', 100),
+                learning_rate=config.get('gb_learning_rate', 0.1),
+                random_state=42
+            )
+            model.fit(X_encoded.values, y_encoded)
+            scaler = None
+        elif method_key == 'naive_bayes':
+            model = GaussianNB()
+            model.fit(X_scaled, y_encoded)
+        else:
+            model = GradientBoostingClassifier(random_state=42)
+            model.fit(X_encoded.values, y_encoded)
+            scaler = None
+
+        self._predict_scaler = scaler
+        self._predict_model = model
+
+    def predict_proba(self, features: dict):
+        """Retourne (classes, probas) pour une ligne."""
+        if self._predict_model is None or not self._original_feature_columns or not self._encoded_feature_columns:
+            raise ValueError("No trained classification model available")
+
+        row = {}
+        for col in self._original_feature_columns:
+            row[col] = features.get(col, None)
+        X_raw = pd.DataFrame([row])
+        X_encoded = self._encode_features(X_raw)
+        X_encoded = X_encoded.reindex(columns=self._encoded_feature_columns, fill_value=0)
+
+        X_in = X_encoded.values
+        if self._predict_scaler is not None:
+            X_in = self._predict_scaler.transform(X_in)
+
+        if hasattr(self._predict_model, 'predict_proba'):
+            proba = self._predict_model.predict_proba(X_in)[0]
+        else:
+            # fallback: probas uniformes
+            classes = getattr(self._predict_model, 'classes_', np.array([]))
+            proba = np.ones(len(classes)) / max(len(classes), 1)
+
+        classes = getattr(self._predict_model, 'classes_', np.arange(len(proba)))
+
+        # Remapper vers classes originales si label encoder
+        if self._label_encoder is not None:
+            class_labels = self._label_encoder.inverse_transform(classes.astype(int))
+        else:
+            class_labels = classes
+
+        return [str(c) for c in class_labels], [float(p) for p in proba]
         
     def perform_analysis(self, config):
         """
@@ -60,15 +178,21 @@ class ClassificationAnalyzer:
                     'models': {}
                 }
         
-        # Préparation des données
-        X = self.df[config['features']].fillna(self.df[config['features']].mean())
+        # Préparation des données (robuste multi-types)
+        X_raw = self.df[config['features']]
+        X = self._encode_features(X_raw)
         y = self.df[config['target']]
         
         # Encoder la variable cible si nécessaire
         le = LabelEncoder()
         if y.dtype == 'object':
-            y = le.fit_transform(y)
+            y = le.fit_transform(y.astype(str))
+            self._label_encoder = le
+            self._class_names = [str(c) for c in le.classes_]
             results['label_mapping'] = dict(zip(le.classes_, le.transform(le.classes_)))
+        else:
+            self._label_encoder = None
+            self._class_names = None
         
         # Split train/test
         X_train, X_test, y_train, y_test = train_test_split(
@@ -138,6 +262,21 @@ class ClassificationAnalyzer:
         
         # Comparaison des modèles
         results['summary'] = self._compare_models(results['models'])
+
+        # Meilleure clé (utilisable côté UI + /predict)
+        best_key = None
+        if results['models']:
+            best_key = max(
+                results['models'].items(),
+                key=lambda kv: kv[1].get('test_metrics', {}).get('accuracy', float('-inf'))
+            )[0]
+
+        if best_key:
+            results['summary']['best_model_key'] = best_key
+            try:
+                self._train_predictor(best_key, X, y, config)
+            except Exception:
+                self._predict_model = None
         
         return results
     

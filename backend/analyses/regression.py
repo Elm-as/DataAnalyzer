@@ -17,6 +17,120 @@ except ImportError:
 class RegressionAnalyzer:
     def __init__(self, df):
         self.df = df
+
+        # Pour /predict (runtime)
+        self.model_type = 'regression'
+        self._encoded_feature_columns = None
+        self._original_feature_columns = None
+        self._predict_scaler = None
+        self._predict_poly = None
+        self._predict_model = None
+        self._best_model_key = None
+        self._best_model_label = None
+        self._target_column = None
+
+    def _encode_features(self, X_raw: pd.DataFrame) -> pd.DataFrame:
+        """Encode les features en numérique (bool/date/catégoriel) et gère les NA."""
+        X = X_raw.copy()
+
+        for col in X.columns:
+            # Bool -> 0/1
+            if X[col].dtype == bool:
+                X[col] = X[col].astype(int)
+                continue
+
+            # Dates -> timestamp (ns)
+            if np.issubdtype(X[col].dtype, np.datetime64):
+                X[col] = X[col].view('int64')
+                continue
+
+            # Tentative de parsing datetime pour object
+            if X[col].dtype == object:
+                parsed = pd.to_datetime(X[col], errors='ignore', utc=True)
+                if np.issubdtype(parsed.dtype, np.datetime64):
+                    X[col] = parsed.view('int64')
+
+        # One-hot pour colonnes non numériques restantes
+        non_numeric = [c for c in X.columns if not np.issubdtype(X[c].dtype, np.number)]
+        if non_numeric:
+            X = pd.get_dummies(X, columns=non_numeric, dummy_na=True)
+
+        # Remplissage NA
+        X = X.apply(pd.to_numeric, errors='coerce')
+        X = X.fillna(X.mean(numeric_only=True)).fillna(0)
+        return X
+
+    def _encode_target(self, y_raw: pd.Series) -> pd.Series:
+        y = y_raw.copy()
+        if np.issubdtype(y.dtype, np.datetime64):
+            return y.view('int64')
+        if y.dtype == object:
+            y = pd.to_numeric(y, errors='coerce')
+        return y
+
+    def _train_predictor(self, method_key: str, X_encoded: pd.DataFrame, y: pd.Series, config: dict):
+        """Entraîne un modèle final pour /predict, basé sur method_key."""
+        self._encoded_feature_columns = X_encoded.columns.tolist()
+        self._original_feature_columns = list(config.get('features', []))
+        self._target_column = config.get('target')
+        self._best_model_key = method_key
+
+        # Par défaut, on utilise scaler + modèle (hors polynomial)
+        self._predict_poly = None
+
+        if method_key == 'polynomial':
+            degree = config.get('polynomial_degree', 2)
+            self._predict_poly = PolynomialFeatures(degree=degree)
+            X_poly = self._predict_poly.fit_transform(X_encoded.values)
+            model = LinearRegression()
+            model.fit(X_poly, y)
+            self._predict_scaler = None
+            self._predict_model = model
+            return
+
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X_encoded.values)
+
+        if method_key == 'linear':
+            model = LinearRegression()
+        elif method_key == 'ridge':
+            model = Ridge(alpha=config.get('ridge_alpha', 1.0))
+        elif method_key == 'lasso':
+            model = Lasso(alpha=config.get('lasso_alpha', 1.0))
+        elif method_key in ('elastic', 'elastic_net'):
+            model = ElasticNet(
+                alpha=config.get('elastic_alpha', 1.0),
+                l1_ratio=config.get('elastic_l1_ratio', 0.5)
+            )
+        else:
+            # fallback
+            model = Ridge(alpha=config.get('ridge_alpha', 1.0))
+
+        model.fit(X_scaled, y)
+        self._predict_scaler = scaler
+        self._predict_model = model
+
+    def predict(self, features: dict):
+        """Prédit la valeur cible à partir d'un dict {feature: value}."""
+        if self._predict_model is None or not self._original_feature_columns or not self._encoded_feature_columns:
+            raise ValueError("No trained regression model available")
+
+        # Construire une ligne avec les colonnes originales
+        row = {}
+        for col in self._original_feature_columns:
+            row[col] = features.get(col, None)
+        X_raw = pd.DataFrame([row])
+        X_encoded = self._encode_features(X_raw)
+        X_encoded = X_encoded.reindex(columns=self._encoded_feature_columns, fill_value=0)
+
+        if self._predict_poly is not None:
+            X_in = self._predict_poly.transform(X_encoded.values)
+            pred = self._predict_model.predict(X_in)[0]
+            return float(pred)
+
+        X_scaled = self._predict_scaler.transform(X_encoded.values) if self._predict_scaler is not None else X_encoded.values
+        pred = self._predict_model.predict(X_scaled)[0]
+        return float(pred)
         
     def perform_analysis(self, config):
         """
@@ -50,9 +164,13 @@ class RegressionAnalyzer:
                     'models': {}
                 }
         
-        # Préparation des données
-        X = self.df[config['features']].fillna(self.df[config['features']].mean())
-        y = self.df[config['target']].fillna(self.df[config['target']].mean())
+        # Préparation des données (robuste multi-types)
+        X_raw = self.df[config['features']]
+        y_raw = self.df[config['target']]
+
+        X = self._encode_features(X_raw)
+        y = self._encode_target(y_raw)
+        y = y.fillna(y.mean(numeric_only=True) if hasattr(y, 'mean') else 0)
         
         # Vérifier si c'est une classification ou régression
         is_classification = len(y.unique()) <= 20 and config.get('is_classification', False)
@@ -107,6 +225,29 @@ class RegressionAnalyzer:
         
         # Comparaison des modèles
         results['summary'] = self._compare_models(results['models'], is_classification)
+
+        # Choisir une clé de meilleur modèle (utilisable côté UI)
+        best_key = None
+        if not is_classification and results['models']:
+            best_key = max(
+                results['models'].items(),
+                key=lambda kv: kv[1].get('test_metrics', {}).get('r2', float('-inf'))
+            )[0]
+        elif is_classification and results['models']:
+            best_key = max(
+                results['models'].items(),
+                key=lambda kv: kv[1].get('test_metrics', {}).get('f1', float('-inf'))
+            )[0]
+
+        self._best_model_label = results['summary'].get('best_model')
+        if best_key:
+            results['summary']['best_model_key'] = best_key
+            # Entraîner un modèle final pour /predict
+            try:
+                self._train_predictor(best_key, X, y, config)
+            except Exception:
+                # Ne pas faire échouer l'analyse si l'entraînement final échoue
+                self._predict_model = None
         
         return results
     

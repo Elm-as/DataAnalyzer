@@ -655,8 +655,6 @@ def analyze_symptom_matching_analysis():
     except Exception as e:
         return jsonify({"error": str(e), "traceback": traceback.format_exc()}), 500
 
-# Stocker les analyseurs pour prédictions
-active_analyzers = {}
 
 @app.route('/analyze/symptom-matching/train', methods=['POST'], endpoint='train_symptom_matching_model')
 def train_symptom_matching_model():
@@ -711,57 +709,85 @@ def predict():
     }
     """
     try:
-        data = request.json
+        data = request.json or {}
         dataset_id = data.get('dataset_id', 'default')
-        features = data.get('features', {})
-        
-        # Récupérer l'analyzer
+        features = data.get('features') or {}
+
         analyzer_entry = _get_analyzer_entry(dataset_id)
         if analyzer_entry is None:
             return jsonify({"error": f"Aucun modèle entraîné pour dataset {dataset_id}. Lancez d'abord une analyse."}), 400
-        
+
         analyzer = analyzer_entry.get('analyzer')
-        
-        if analyzer.trained_model is None:
-            return jsonify({"error": "Aucun modèle ML entraîné. Relancez l'analyse avec model='bernoulli' ou 'all'."}), 400
-        
-        # Construire X_test à partir des features
-        # Ordre doit correspondre à analyzer.feature_names
+        stored_type = analyzer_entry.get('model_type')
+        requested_type = data.get('analysis_type')
+        model_type = requested_type or stored_type or getattr(analyzer, 'model_type', None) or 'symptom_matching'
+        model_type = str(model_type).lower().replace('-', '_')
+
+        # 1) Régression: retourne une valeur numérique `prediction`
+        if model_type == 'regression':
+            if not hasattr(analyzer, 'predict'):
+                return jsonify({"error": "Le modèle de régression stocké ne supporte pas la prédiction runtime."}), 400
+            prediction = analyzer.predict(features)
+            results = analyzer_entry.get('results') or {}
+            summary = results.get('summary', {})
+            return jsonify(_normalize_payload({
+                'model_type': 'regression',
+                'model': summary.get('best_model') or summary.get('best_model_key') or 'Régression',
+                'prediction': prediction,
+            })), 200
+
+        # 2) Classification: retourne `predictions` + `top_prediction`
+        if model_type == 'classification':
+            if hasattr(analyzer, 'predict_proba'):
+                classes, probas = analyzer.predict_proba(features)
+                pairs = list(zip(classes, probas))
+                pairs.sort(key=lambda p: p[1], reverse=True)
+                predictions = [{
+                    'class': str(c),
+                    'probability': round(float(p), 4)
+                } for c, p in pairs[:10]]
+            else:
+                return jsonify({"error": "Le modèle de classification stocké ne supporte pas la prédiction runtime."}), 400
+
+            results = analyzer_entry.get('results') or {}
+            summary = results.get('summary', {})
+            return jsonify(_normalize_payload({
+                'model_type': 'classification',
+                'model': summary.get('best_model') or summary.get('best_model_key') or 'Classification',
+                'predictions': predictions,
+                'top_prediction': predictions[0] if predictions else None,
+            })), 200
+
+        # 3) Symptom-matching (historique): utilise trained_model + feature_names
+        if not hasattr(analyzer, 'trained_model') or analyzer.trained_model is None:
+            return jsonify({"error": "Aucun modèle ML entraîné. Relancez l'analyse symptom-matching avec model='bernoulli' ou 'all'."}), 400
+        if not getattr(analyzer, 'feature_names', None):
+            return jsonify({"error": "Modèle symptom-matching invalide: feature_names manquants."}), 400
+
         X_test = []
         for feature_name in analyzer.feature_names:
-            value = features.get(feature_name, 0)  # Par défaut 0 si absent
+            value = features.get(feature_name, 0)
             X_test.append(value)
-        
-        X_test = np.array([X_test])  # Shape (1, n_features)
-        
-        print(f"\n[PREDICT] Prédiction pour dataset {dataset_id}")
-        print(f"  - X_test shape: {X_test.shape}")
-        print(f"  - Features fournies: {len(features)}/{len(analyzer.feature_names)}")
-        print(f"  - Valeurs non-nulles: {np.sum(X_test > 0)}")
-        
-        # Prédire avec probabilités
+        X_test = np.array([X_test])
+
         y_proba = analyzer.trained_model.predict_proba(X_test)[0]
-        
-        # Trier par probabilité décroissante
-        top_indices = y_proba.argsort()[-10:][::-1]  # Top 10
-        
-        predictions = []
-        for idx in top_indices:
-            predictions.append({
-                'class': str(analyzer.classes_[idx]),
-                'probability': round(float(y_proba[idx]), 4)
-            })
-        
+        top_indices = y_proba.argsort()[-10:][::-1]
+
+        predictions = [{
+            'class': str(analyzer.classes_[idx]) if getattr(analyzer, 'classes_', None) is not None else str(idx),
+            'probability': round(float(y_proba[idx]), 4)
+        } for idx in top_indices]
+
         result = {
+            'model_type': 'symptom_matching',
+            'model': 'Symptom matching',
             'predictions': predictions,
             'top_prediction': predictions[0] if predictions else None,
             'n_features_used': int(np.sum(X_test > 0)),
             'total_features': len(analyzer.feature_names)
         }
-        
-        print(f"  - Top prédiction: {result['top_prediction']}")
-        
-        return jsonify(result), 200
+
+        return jsonify(_normalize_payload(result)), 200
         
     except Exception as e:
         return jsonify({"error": str(e), "traceback": traceback.format_exc()}), 500
