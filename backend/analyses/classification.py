@@ -23,6 +23,15 @@ try:
 except ImportError:
     VALIDATION_AVAILABLE = False
 
+# Import explainability and advanced features
+try:
+    from analyses.explainability import ExplainabilityAnalyzer, ModelAuditor, CalibrationAnalyzer
+    from analyses.feature_engineering import FeatureEngineer, ImbalanceHandler
+    from analyses.data_quality import DataQualityAnalyzer
+    EXPLAINABILITY_AVAILABLE = True
+except ImportError:
+    EXPLAINABILITY_AVAILABLE = False
+
 class ClassificationAnalyzer:
     def __init__(self, df):
         self.df = df
@@ -160,8 +169,34 @@ class ClassificationAnalyzer:
         """
         results = {
             'summary': {},
-            'models': {}
+            'models': {},
+            'explainability': {},
+            'data_quality': {},
+            'feature_engineering': {},
+            'imbalance_analysis': {}
         }
+        
+        # Data Quality Analysis (Phase 1)
+        if EXPLAINABILITY_AVAILABLE:
+            quality_report = DataQualityAnalyzer.generate_quality_report(
+                self.df, config['target']
+            )
+            results['data_quality'] = quality_report
+            
+            # Warn if quality is poor
+            if quality_report.get('quality_score', 100) < 60:
+                results['warnings'] = results.get('warnings', [])
+                results['warnings'].append(
+                    f"Data quality score is low ({quality_report['quality_score']:.1f}/100). "
+                    "Consider cleaning the data before modeling."
+                )
+        
+        # Feature Engineering Suggestions (Phase 2)
+        if EXPLAINABILITY_AVAILABLE:
+            fe_suggestions = FeatureEngineer.analyze_and_suggest(
+                self.df, config['target']
+            )
+            results['feature_engineering'] = fe_suggestions
         
         # Valider les features si le module est disponible
         if VALIDATION_AVAILABLE:
@@ -182,6 +217,19 @@ class ClassificationAnalyzer:
         X_raw = self.df[config['features']]
         X = self._encode_features(X_raw)
         y = self.df[config['target']]
+        
+        # Imbalance Detection (Phase 3)
+        if EXPLAINABILITY_AVAILABLE:
+            imbalance_info = ImbalanceHandler.detect_imbalance(y)
+            results['imbalance_analysis'] = imbalance_info
+            
+            if imbalance_info['is_imbalanced']:
+                results['warnings'] = results.get('warnings', [])
+                results['warnings'].append(
+                    f"Class imbalance detected: {imbalance_info['severity']} "
+                    f"(ratio: {imbalance_info['imbalance_ratio']:.1f}:1). "
+                    f"{imbalance_info['recommendation']}"
+                )
         
         # Encoder la variable cible si nécessaire
         le = LabelEncoder()
@@ -273,6 +321,41 @@ class ClassificationAnalyzer:
 
         if best_key:
             results['summary']['best_model_key'] = best_key
+            
+            # Model Audit (Phase 4)
+            if EXPLAINABILITY_AVAILABLE:
+                audit_report = ModelAuditor.audit_model_selection(
+                    results['models'], best_key, y
+                )
+                results['model_audit'] = audit_report
+            
+            # Feature Importance (Phase 5)
+            if EXPLAINABILITY_AVAILABLE and best_key in results['models']:
+                best_model_result = results['models'][best_key]
+                if 'feature_importance' not in best_model_result:
+                    # Try to extract it if not already present
+                    try:
+                        # We need the actual trained model, not just results
+                        # This will be added during evaluation
+                        pass
+                    except Exception:
+                        pass
+            
+            # Calibration Analysis (Phase 6) - for models with probability
+            if EXPLAINABILITY_AVAILABLE and len(y_test) > 0:
+                try:
+                    # Get probabilities from best model
+                    # We'll store the model during training for this
+                    if hasattr(self, '_best_model_obj') and self._best_model_obj:
+                        y_proba = self._best_model_obj.predict_proba(X_test)
+                        if len(np.unique(y_test)) == 2:  # Binary classification
+                            calibration = CalibrationAnalyzer.analyze_calibration(
+                                y_test, y_proba[:, 1]
+                            )
+                            results['calibration'] = calibration
+                except Exception:
+                    pass
+            
             try:
                 self._train_predictor(best_key, X, y, config)
             except Exception:
@@ -487,7 +570,12 @@ class ClassificationAnalyzer:
                 'recall': float(recall_score(y_test, y_pred_test, average='weighted', zero_division=0)),
                 'f1': float(f1_score(y_test, y_pred_test, average='weighted', zero_division=0))
             },
-            'cv_scores': {
+            'cross_validation': {
+                'mean': float(cv_scores.mean()),
+                'std': float(cv_scores.std()),
+                'scores': cv_scores.tolist()
+            },
+            'cv_scores': {  # Keep for backward compatibility
                 'mean': float(cv_scores.mean()),
                 'std': float(cv_scores.std()),
                 'scores': cv_scores.tolist()
@@ -499,6 +587,34 @@ class ClassificationAnalyzer:
         
         if has_proba:
             result['probabilities_sample'] = y_pred_proba_test[:10].tolist()
+        
+        # Add explainability features
+        if EXPLAINABILITY_AVAILABLE:
+            # Feature importance
+            feature_names = config.get('features', [])
+            if len(feature_names) > 0:
+                importance = ExplainabilityAnalyzer.get_feature_importance(
+                    model, feature_names, 'tree' if hasattr(model, 'feature_importances_') else 'linear'
+                )
+                if importance.get('available'):
+                    result['feature_importance_global'] = importance
+            
+            # Calibration for binary classification
+            if has_proba and len(np.unique(y_test)) == 2:
+                try:
+                    calibration = CalibrationAnalyzer.analyze_calibration(
+                        y_test, y_pred_proba_test[:, 1]
+                    )
+                    result['calibration'] = calibration
+                    
+                    # Suggest calibration if needed
+                    if not calibration.get('is_well_calibrated', True):
+                        brier = calibration.get('brier_score', 0)
+                        model_type = 'tree' if hasattr(model, 'feature_importances_') else 'linear'
+                        suggestion = CalibrationAnalyzer.suggest_calibration_method(brier, model_type)
+                        result['calibration_suggestion'] = suggestion
+                except Exception:
+                    pass
         
         return result
     

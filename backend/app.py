@@ -792,6 +792,336 @@ def predict():
     except Exception as e:
         return jsonify({"error": str(e), "traceback": traceback.format_exc()}), 500
 
+@app.route('/predict/explain', methods=['POST'])
+def predict_with_explanation():
+    """
+    Endpoint de prédiction avec explications détaillées
+    
+    Body:
+    {
+        "dataset_id": "default",
+        "features": {...}
+    }
+    
+    Returns:
+    {
+        "prediction": {...},
+        "explanation": {
+            "feature_contributions": [...],
+            "interpretation_messages": [...],
+            "confidence_level": "high/moderate/low"
+        }
+    }
+    """
+    try:
+        # Import explainability module
+        try:
+            from analyses.explainability import ExplainabilityAnalyzer
+            explainability_available = True
+        except ImportError:
+            explainability_available = False
+        
+        data = request.json or {}
+        dataset_id = data.get('dataset_id', 'default')
+        features = data.get('features') or {}
+        
+        # Get standard prediction first
+        analyzer_entry = _get_analyzer_entry(dataset_id)
+        if analyzer_entry is None:
+            return jsonify({"error": f"No trained model for dataset {dataset_id}"}), 400
+        
+        analyzer = analyzer_entry.get('analyzer')
+        model_type = analyzer_entry.get('model_type', 'classification')
+        
+        # Get prediction
+        if model_type == 'classification' and hasattr(analyzer, 'predict_proba'):
+            classes, probas = analyzer.predict_proba(features)
+            pairs = list(zip(classes, probas))
+            pairs.sort(key=lambda p: p[1], reverse=True)
+            
+            top_class = pairs[0][0]
+            top_prob = pairs[0][1]
+            
+            prediction_result = {
+                'class': str(top_class),
+                'probability': float(top_prob),
+                'all_predictions': [
+                    {'class': str(c), 'probability': float(p)} 
+                    for c, p in pairs[:5]
+                ]
+            }
+            
+            # Add explanation if available
+            if explainability_available and analyzer._predict_model:
+                # Convert features to array
+                feature_names = analyzer._original_feature_columns or []
+                X_sample = np.array([features.get(f, 0) for f in feature_names])
+                
+                # Get local explanation
+                local_exp = ExplainabilityAnalyzer.explain_prediction_local(
+                    analyzer._predict_model, 
+                    X_sample, 
+                    feature_names,
+                    base_value=0.5
+                )
+                
+                # Generate interpretation messages
+                messages = ExplainabilityAnalyzer.generate_interpretation_messages(
+                    top_class,
+                    top_prob,
+                    local_exp.get('contributions', [])
+                )
+                
+                prediction_result['explanation'] = {
+                    'available': True,
+                    'local_contributions': local_exp.get('contributions', []),
+                    'interpretation_messages': messages,
+                    'confidence_level': 'high' if top_prob > 0.8 else 'moderate' if top_prob > 0.6 else 'low'
+                }
+            else:
+                prediction_result['explanation'] = {
+                    'available': False,
+                    'message': 'Explainability not available for this model'
+                }
+            
+            return jsonify(_normalize_payload(prediction_result)), 200
+        
+        return jsonify({"error": "Explanation only supported for classification models"}), 400
+        
+    except Exception as e:
+        return jsonify({"error": str(e), "traceback": traceback.format_exc()}), 500
+
+@app.route('/whatif/analyze', methods=['POST'])
+def whatif_analyze():
+    """
+    What-If analysis and counterfactual explanations
+    
+    Body:
+    {
+        "dataset_id": "default",
+        "current_features": {...},
+        "desired_outcome": 1,
+        "max_changes": 3
+    }
+    
+    Returns:
+    {
+        "counterfactual": {
+            "found": true/false,
+            "changes": [...]
+        },
+        "scenarios": [...]
+    }
+    """
+    try:
+        # Import what-if module
+        try:
+            from analyses.what_if import WhatIfAnalyzer
+            whatif_available = True
+        except ImportError:
+            whatif_available = False
+        
+        if not whatif_available:
+            return jsonify({"error": "What-If analysis module not available"}), 400
+        
+        data = request.json or {}
+        dataset_id = data.get('dataset_id', 'default')
+        features = data.get('current_features') or {}
+        desired_outcome = data.get('desired_outcome')
+        max_changes = data.get('max_changes', 3)
+        
+        # Get analyzer
+        analyzer_entry = _get_analyzer_entry(dataset_id)
+        if analyzer_entry is None:
+            return jsonify({"error": f"No trained model for dataset {dataset_id}"}), 400
+        
+        analyzer = analyzer_entry.get('analyzer')
+        
+        if not hasattr(analyzer, '_predict_model') or not analyzer._predict_model:
+            return jsonify({"error": "No model available for what-if analysis"}), 400
+        
+        # Convert features to array
+        feature_names = analyzer._original_feature_columns or []
+        X_sample = np.array([features.get(f, 0) for f in feature_names])
+        
+        # Get current prediction
+        current_pred = analyzer._predict_model.predict(X_sample.reshape(1, -1))[0]
+        
+        # Get feature ranges from stored data (approximate)
+        results = analyzer_entry.get('results') or {}
+        feature_ranges = {f: (0, 1) for f in feature_names}  # Default ranges
+        
+        # Find counterfactual
+        counterfactual = WhatIfAnalyzer.find_counterfactual(
+            analyzer._predict_model,
+            X_sample,
+            feature_names,
+            int(current_pred),
+            int(desired_outcome) if desired_outcome is not None else 1 - int(current_pred),
+            feature_ranges,
+            max_changes=max_changes
+        )
+        
+        # Generate scenarios
+        scenarios = WhatIfAnalyzer.generate_scenarios(
+            X_sample,
+            feature_names,
+            analyzer._predict_model,
+            n_scenarios=5
+        )
+        
+        return jsonify(_normalize_payload({
+            'current_prediction': int(current_pred),
+            'desired_outcome': desired_outcome,
+            'counterfactual': counterfactual,
+            'scenarios': scenarios
+        })), 200
+        
+    except Exception as e:
+        return jsonify({"error": str(e), "traceback": traceback.format_exc()}), 500
+
+@app.route('/model/stress-test', methods=['POST'])
+def stress_test_model():
+    """
+    Run stress tests on trained model
+    
+    Body:
+    {
+        "dataset_id": "default"
+    }
+    
+    Returns:
+    {
+        "stress_test_results": {
+            "noise_robustness": {...},
+            "extreme_values": {...},
+            "overall_robustness": "high/moderate/low"
+        }
+    }
+    """
+    try:
+        # Import stress testing module
+        try:
+            from analyses.what_if import StressTester
+            stress_test_available = True
+        except ImportError:
+            stress_test_available = False
+        
+        if not stress_test_available:
+            return jsonify({"error": "Stress testing module not available"}), 400
+        
+        data = request.json or {}
+        dataset_id = data.get('dataset_id', 'default')
+        
+        # Get analyzer
+        analyzer_entry = _get_analyzer_entry(dataset_id)
+        if analyzer_entry is None:
+            return jsonify({"error": f"No trained model for dataset {dataset_id}"}), 400
+        
+        analyzer = analyzer_entry.get('analyzer')
+        
+        if not hasattr(analyzer, '_predict_model') or not analyzer._predict_model:
+            return jsonify({"error": "No model available for stress testing"}), 400
+        
+        # We need test data - this would need to be stored during training
+        # For now, return a placeholder response
+        return jsonify({
+            "message": "Stress testing requires access to test data",
+            "recommendation": "Run stress test during model training for accurate results"
+        }), 200
+        
+    except Exception as e:
+        return jsonify({"error": str(e), "traceback": traceback.format_exc()}), 500
+
+@app.route('/data/quality-report', methods=['POST'])
+def data_quality_report():
+    """
+    Generate comprehensive data quality report
+    
+    Body:
+    {
+        "data": [...],
+        "target_column": "Survived"
+    }
+    
+    Returns:
+    {
+        "quality_report": {
+            "summary": {...},
+            "missing_values": {...},
+            "duplicates": {...},
+            "warnings": [...],
+            "recommendations": [...]
+        }
+    }
+    """
+    try:
+        # Import data quality module
+        try:
+            from analyses.data_quality import DataQualityAnalyzer
+            quality_available = True
+        except ImportError:
+            quality_available = False
+        
+        if not quality_available:
+            return jsonify({"error": "Data quality module not available"}), 400
+        
+        data = request.json
+        df = pd.DataFrame(data['data'])
+        target_col = data.get('target_column')
+        
+        # Generate quality report
+        report = DataQualityAnalyzer.generate_quality_report(df, target_col)
+        
+        return jsonify(_normalize_payload(report)), 200
+        
+    except Exception as e:
+        return jsonify({"error": str(e), "traceback": traceback.format_exc()}), 500
+
+@app.route('/features/suggest', methods=['POST'])
+def suggest_feature_engineering():
+    """
+    Suggest feature engineering opportunities
+    
+    Body:
+    {
+        "data": [...],
+        "target_column": "Survived"
+    }
+    
+    Returns:
+    {
+        "suggestions": {
+            "categorical_grouping": [...],
+            "normalization": [...],
+            "derived_features": [...],
+            "transformations": [...]
+        }
+    }
+    """
+    try:
+        # Import feature engineering module
+        try:
+            from analyses.feature_engineering import FeatureEngineer
+            fe_available = True
+        except ImportError:
+            fe_available = False
+        
+        if not fe_available:
+            return jsonify({"error": "Feature engineering module not available"}), 400
+        
+        data = request.json
+        df = pd.DataFrame(data['data'])
+        target_col = data.get('target_column')
+        
+        # Get suggestions
+        suggestions = FeatureEngineer.analyze_and_suggest(df, target_col)
+        
+        return jsonify(_normalize_payload(suggestions)), 200
+        
+    except Exception as e:
+        return jsonify({"error": str(e), "traceback": traceback.format_exc()}), 500
+
 @app.route('/report/generate', methods=['POST'])
 def generate_report():
     """Génération de rapport PDF A4, police 13-14, noir et blanc"""
