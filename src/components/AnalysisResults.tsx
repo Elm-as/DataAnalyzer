@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { ChevronLeft, Download, RefreshCw, BarChart3, TrendingUp, AlertTriangle, Target, Eye, FileText, Layers, Copy, Stethoscope, Zap } from 'lucide-react';
+import { ChevronLeft, Download, RefreshCw, BarChart3, TrendingUp, AlertTriangle, Target, Eye, FileText, Layers, Copy, Stethoscope, Zap, Award, Database } from 'lucide-react';
 import { DataColumn } from '../App';
 import { api } from '../api/backend';
 import PredictionSimulator from './PredictionSimulator';
+import ExplainabilityDisplay from './ExplainabilityDisplay';
+import DataInsights from './DataInsights';
 
 interface AnalysisResultsProps {
   results: any;
@@ -57,6 +59,8 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
 
   const tabs = [
     { id: 'overview', name: 'Vue d\'ensemble', icon: Eye },
+    { id: 'dataInsights', name: 'Data Insights', icon: Database, available: results.analyses.classification },
+    { id: 'explainability', name: 'Explainabilité', icon: Award, available: results.analyses.classification },
     { id: 'descriptive', name: 'Statistiques', icon: BarChart3, available: results.analyses.descriptiveStats },
     { id: 'correlations', name: 'Corrélations', icon: Target, available: results.analyses.correlations },
     { id: 'distributions', name: 'Distributions', icon: TrendingUp, available: results.analyses.distributions },
@@ -1300,6 +1304,10 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
     switch (activeTab) {
       case 'overview':
         return renderOverview();
+      case 'dataInsights':
+        return <DataInsights results={results} />;
+      case 'explainability':
+        return <ExplainabilityDisplay results={results} />;
       case 'descriptive':
         return renderDescriptiveStats();
       case 'correlations':
